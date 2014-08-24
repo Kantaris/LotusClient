@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{A2ACCA20-7BCD-4A62-8875-D21AF4A15CD2}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>LotusVPN</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>vpngui</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="OpenVPN">
+      <HintPath>..\..\Downloads\Debug\OpenVPN.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenVPNUtils">
+      <HintPath>..\..\Downloads\Debug\OpenVPNUtils.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Loopback.cs" />
+    <Compile Include="Resources\OpenWeb\BasePipe.cs" />
+    <Compile Include="Resources\OpenWeb\CacheClearEventArgs.cs" />
+    <Compile Include="Resources\OpenWeb\CalculateReportHandler.cs" />
+    <Compile Include="Resources\OpenWeb\CertificateValidity.cs" />
+    <Compile Include="Resources\OpenWeb\ClientChatter.cs" />
+    <Compile Include="Resources\OpenWeb\ClientPipe.cs" />
+    <Compile Include="Resources\OpenWeb\CodeDescription.cs" />
+    <Compile Include="Resources\OpenWeb\CONFIG.cs" />
+    <Compile Include="Resources\OpenWeb\ConnectionEventArgs.cs" />
+    <Compile Include="Resources\OpenWeb\CONNECTTunnel.cs" />
+    <Compile Include="Resources\OpenWeb\ContinueTransactionEventArgs.cs" />
+    <Compile Include="Resources\OpenWeb\ContinueTransactionReason.cs" />
+    <Compile Include="Resources\OpenWeb\DNSResolver.cs" />
+    <Compile Include="Resources\OpenWeb\FTPGateway.cs" />
+    <Compile Include="Resources\OpenWeb\GatewayType.cs" />
+    <Compile Include="Resources\OpenWeb\GenericTunnel.cs" />
+    <Compile Include="Resources\OpenWeb\HostList.cs" />
+    <Compile Include="Resources\OpenWeb\HotkeyModifiers.cs" />
+    <Compile Include="Resources\OpenWeb\HTTPHeaderItem.cs" />
+    <Compile Include="Resources\OpenWeb\HTTPHeaderParseWarnings.cs" />
+    <Compile Include="Resources\OpenWeb\HTTPHeaders.cs" />
+    <Compile Include="Resources\OpenWeb\HTTPRequestHeaders.cs" />
+    <Compile Include="Resources\OpenWeb\HTTPResponseHeaders.cs" />
+    <Compile Include="Resources\OpenWeb\HTTPSClientHello.cs" />
+    <Compile Include="Resources\OpenWeb\HTTPSServerHello.cs" />
+    <Compile Include="Resources\OpenWeb\HTTPSUtilities.cs" />
+    <Compile Include="Resources\OpenWeb\ICertificateProvider.cs" />
+    <Compile Include="Resources\OpenWeb\ICertificateProvider2.cs" />
+    <Compile Include="Resources\OpenWeb\ICertificateProvider3.cs" />
+    <Compile Include="Resources\OpenWeb\IOpenWebPreferences.cs" />
+    <Compile Include="Resources\OpenWeb\ISAZProvider.cs" />
+    <Compile Include="Resources\OpenWeb\ISAZReader.cs" />
+    <Compile Include="Resources\OpenWeb\ISAZWriter.cs" />
+    <Compile Include="Resources\OpenWeb\ITunnel.cs" />
+    <Compile Include="Resources\OpenWeb\MockTunnel.cs" />
+    <Compile Include="Resources\OpenWeb\NotificationEventArgs.cs" />
+    <Compile Include="Resources\OpenWeb\OpenWebApplication.cs" />
+    <Compile Include="Resources\OpenWeb\OpenWebCoreStartupFlags.cs" />
+    <Compile Include="Resources\OpenWeb\OpenWebTranscoders.cs" />
+    <Compile Include="Resources\OpenWeb\Parser.cs" />
+    <Compile Include="Resources\OpenWeb\PeriodicWorker.cs" />
+    <Compile Include="Resources\OpenWeb\PipePool.cs" />
+    <Compile Include="Resources\OpenWeb\PipeReadBuffer.cs" />
+    <Compile Include="Resources\OpenWeb\PipeReusePolicy.cs" />
+    <Compile Include="Resources\OpenWeb\PrefChangeEventArgs.cs" />
+    <Compile Include="Resources\OpenWeb\PreferenceBag.cs" />
+    <Compile Include="Resources\OpenWeb\ProcessFilterCategories.cs" />
+    <Compile Include="Resources\OpenWeb\ProcessHelper.cs" />
+    <Compile Include="Resources\OpenWeb\ProcessingStates.cs" />
+    <Compile Include="Resources\OpenWeb\ProfferFormatAttribute.cs" />
+    <Compile Include="Resources\OpenWeb\ProgressCallbackEventArgs.cs" />
+    <Compile Include="Resources\OpenWeb\Proxy.cs" />
+    <Compile Include="Resources\OpenWeb\ProxyBypassList.cs" />
+    <Compile Include="Resources\OpenWeb\ProxyExecuteParams.cs" />
+    <Compile Include="Resources\OpenWeb\RASInfo.cs" />
+    <Compile Include="Resources\OpenWeb\RawReadEventArgs.cs" />
+    <Compile Include="Resources\OpenWeb\RegistryWatcher.cs" />
+    <Compile Include="Resources\OpenWeb\RequiredVersionAttribute.cs" />
+    <Compile Include="Resources\OpenWeb\RetryMode.cs" />
+    <Compile Include="Resources\OpenWeb\SAZWriterDelegate.cs" />
+    <Compile Include="Resources\OpenWeb\ScheduledTasks.cs" />
+    <Compile Include="Resources\OpenWeb\ServerChatter.cs" />
+    <Compile Include="Resources\OpenWeb\ServerPipe.cs" />
+    <Compile Include="Resources\OpenWeb\Session.cs" />
+    <Compile Include="Resources\OpenWeb\SessionData.cs" />
+    <Compile Include="Resources\OpenWeb\SessionFlags.cs" />
+    <Compile Include="Resources\OpenWeb\SessionStateHandler.cs" />
+    <Compile Include="Resources\OpenWeb\SessionStates.cs" />
+    <Compile Include="Resources\OpenWeb\SessionTimers.cs" />
+    <Compile Include="Resources\OpenWeb\SimpleEventHandler.cs" />
+    <Compile Include="Resources\OpenWeb\StateChangeEventArgs.cs" />
+    <Compile Include="Resources\OpenWeb\StringExtensions.cs" />
+    <Compile Include="Resources\OpenWeb\TranscoderTuple.cs" />
+    <Compile Include="Resources\OpenWeb\URLMonInterop.cs" />
+    <Compile Include="Resources\OpenWeb\Utilities.cs" />
+    <Compile Include="Resources\OpenWeb\ValidateServerCertificateEventArgs.cs" />
+    <Compile Include="Resources\OpenWeb\VersionStruct.cs" />
+    <Compile Include="Resources\OpenWeb\WebSocket.cs" />
+    <Compile Include="Resources\OpenWeb\WebSocketCloseReasons.cs" />
+    <Compile Include="Resources\OpenWeb\WebSocketFrameTypes.cs" />
+    <Compile Include="Resources\OpenWeb\WebSocketMessage.cs" />
+    <Compile Include="Resources\OpenWeb\WebSocketMessageEventArgs.cs" />
+    <Compile Include="Resources\OpenWeb\WebSocketTimers.cs" />
+    <Compile Include="Resources\OpenWeb\WebSocketUtility.cs" />
+    <Compile Include="Resources\OpenWeb\WinHTTPAutoProxy.cs" />
+    <Compile Include="Resources\OpenWeb\WinHTTPNative.cs" />
+    <Compile Include="Resources\OpenWeb\WinINETCache.cs" />
+    <Compile Include="Resources\OpenWeb\WinINETConnectoid.cs" />
+    <Compile Include="Resources\OpenWeb\WinINETConnectoids.cs" />
+    <Compile Include="Resources\OpenWeb\WinINETProxyInfo.cs" />
+    <Compile Include="Resources\OpenWeb\Winsock.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SettingsDialog.Designer.cs">
+      <DependentUpon>SettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VPN\FProxy.cs" />
+    <Compile Include="vpn\OpenVPN.cs" />
+    <Compile Include="vpn\Server.cs" />
+    <Compile Include="ConfigurationErrorsException.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="SessionStats.cs" />
+    <Compile Include="StatsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatsForm.Designer.cs">
+      <DependentUpon>StatsForm.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resources" />
+    <EmbeddedResource Include="MainControl.resources" />
+    <EmbeddedResource Include="SettingsDialog.resx">
+      <DependentUpon>SettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatsForm.resx">
+      <DependentUpon>StatsForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\node.dll" />
+    <None Include="Resources\sslocal" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\encrypt.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\inet.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\local.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\merge_sort.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\udprelay.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\utils.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\green3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\red3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\gui2.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

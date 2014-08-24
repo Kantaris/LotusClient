@@ -1,0 +1,459 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4BE4906410445F2F006BE471 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BE4906310445F2F006BE471 /* Security.framework */; };
+		4BE4906810445F36006BE471 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BE4906710445F36006BE471 /* ServiceManagement.framework */; };
+		4BE49092104463A0006BE471 /* com.kantaris.vpn.VPNHelper in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4BE4905D10445E0A006BE471 /* com.kantaris.vpn.VPNHelper */; };
+		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		DA13547319A2FE9F0066AB7E /* vpncore in Resources */ = {isa = PBXBuildFile; fileRef = DA13547219A2FE9F0066AB7E /* vpncore */; };
+		DA1F8EFB199DAB7700DC02C1 /* 0.png in Resources */ = {isa = PBXBuildFile; fileRef = DA1F8EEA199DAB7700DC02C1 /* 0.png */; };
+		DA1F8EFC199DAB7700DC02C1 /* 2.png in Resources */ = {isa = PBXBuildFile; fileRef = DA1F8EEB199DAB7700DC02C1 /* 2.png */; };
+		DA1F8EFD199DAB7700DC02C1 /* 3.png in Resources */ = {isa = PBXBuildFile; fileRef = DA1F8EEC199DAB7700DC02C1 /* 3.png */; };
+		DA1F8EFE199DAB7700DC02C1 /* 4.png in Resources */ = {isa = PBXBuildFile; fileRef = DA1F8EED199DAB7700DC02C1 /* 4.png */; };
+		DA1F8EFF199DAB7700DC02C1 /* 5.png in Resources */ = {isa = PBXBuildFile; fileRef = DA1F8EEE199DAB7700DC02C1 /* 5.png */; };
+		DA1F8F02199DAB7700DC02C1 /* green3.png in Resources */ = {isa = PBXBuildFile; fileRef = DA1F8EF1199DAB7700DC02C1 /* green3.png */; };
+		DA1F8F03199DAB7700DC02C1 /* gui3.png in Resources */ = {isa = PBXBuildFile; fileRef = DA1F8EF2199DAB7700DC02C1 /* gui3.png */; };
+		DA1F8F08199DAB7700DC02C1 /* red3.png in Resources */ = {isa = PBXBuildFile; fileRef = DA1F8EF7199DAB7700DC02C1 /* red3.png */; };
+		DA7BB3C11986670300AE99D4 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA7BB3C01986670300AE99D4 /* Images.xcassets */; };
+		DAA88F751983FA87002D1E7D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DAA88F701983FA87002D1E7D /* main.m */; };
+		DAA88F771983FA87002D1E7D /* SMJobBlessAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAA88F731983FA87002D1E7D /* SMJobBlessAppController.m */; };
+		DAA88F781983FA87002D1E7D /* VPNApp-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DAA88F741983FA87002D1E7D /* VPNApp-Info.plist */; };
+		DAA88F7D1983FF15002D1E7D /* VPNHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = DAA88F7C1983FF15002D1E7D /* VPNHelper.m */; };
+		DAD9A49B1992229800339F47 /* VButton.m in Sources */ = {isa = PBXBuildFile; fileRef = DAD9A49A1992229800339F47 /* VButton.m */; };
+		DAD9A49F1992238500339F47 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DAD9A49E1992238400339F47 /* MainMenu.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4BE4907E1044624F006BE471 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4BE4905C10445E0A006BE471;
+			remoteInfo = SMJobBlessHelper;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		4BE49098104463C5006BE471 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/LaunchServices;
+			dstSubfolderSpec = 1;
+			files = (
+				4BE49092104463A0006BE471 /* com.kantaris.vpn.VPNHelper in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		4BE4905D10445E0A006BE471 /* com.kantaris.vpn.VPNHelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = com.kantaris.vpn.VPNHelper; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BE4906310445F2F006BE471 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		4BE4906710445F36006BE471 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
+		8D1107320486CEB800E47090 /* VPN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VPN.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA13547219A2FE9F0066AB7E /* vpncore */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = vpncore; path = "../../../../Desktop/node-master/out/Release/vpncore"; sourceTree = "<group>"; };
+		DA1F8EEA199DAB7700DC02C1 /* 0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 0.png; path = Resources/0.png; sourceTree = "<group>"; };
+		DA1F8EEB199DAB7700DC02C1 /* 2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 2.png; path = Resources/2.png; sourceTree = "<group>"; };
+		DA1F8EEC199DAB7700DC02C1 /* 3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 3.png; path = Resources/3.png; sourceTree = "<group>"; };
+		DA1F8EED199DAB7700DC02C1 /* 4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 4.png; path = Resources/4.png; sourceTree = "<group>"; };
+		DA1F8EEE199DAB7700DC02C1 /* 5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 5.png; path = Resources/5.png; sourceTree = "<group>"; };
+		DA1F8EF1199DAB7700DC02C1 /* green3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = green3.png; path = Resources/green3.png; sourceTree = "<group>"; };
+		DA1F8EF2199DAB7700DC02C1 /* gui3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gui3.png; path = Resources/gui3.png; sourceTree = "<group>"; };
+		DA1F8EF7199DAB7700DC02C1 /* red3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = red3.png; path = Resources/red3.png; sourceTree = "<group>"; };
+		DA7BB3C01986670300AE99D4 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = VPN/Images.xcassets; sourceTree = "<group>"; };
+		DAA88F701983FA87002D1E7D /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		DAA88F721983FA87002D1E7D /* SMJobBlessAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMJobBlessAppController.h; sourceTree = "<group>"; };
+		DAA88F731983FA87002D1E7D /* SMJobBlessAppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMJobBlessAppController.m; sourceTree = "<group>"; };
+		DAA88F741983FA87002D1E7D /* VPNApp-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "VPNApp-Info.plist"; sourceTree = "<group>"; };
+		DAA88F7A1983FF15002D1E7D /* VPNHelper-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "VPNHelper-Info.plist"; sourceTree = "<group>"; };
+		DAA88F7B1983FF15002D1E7D /* VPNHelper-Launchd.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "VPNHelper-Launchd.plist"; sourceTree = "<group>"; };
+		DAA88F7C1983FF15002D1E7D /* VPNHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNHelper.m; sourceTree = "<group>"; };
+		DAD9A45C199202E600339F47 /* com.kantaris.vpn.VPNHelper copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "com.kantaris.vpn.VPNHelper copy-Info.plist"; path = "/Users/christoferpersson/Downloads/SMJobBlessXPC-master/com.kantaris.vpn.VPNHelper copy-Info.plist"; sourceTree = "<absolute>"; };
+		DAD9A4991992229000339F47 /* VButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VButton.h; sourceTree = "<group>"; };
+		DAD9A49A1992229800339F47 /* VButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VButton.m; sourceTree = "<group>"; };
+		DAD9A49E1992238400339F47 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4BE4905B10445E0A006BE471 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D11072E0486CEB800E47090 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
+				4BE4906410445F2F006BE471 /* Security.framework in Frameworks */,
+				4BE4906810445F36006BE471 /* ServiceManagement.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
+				4BE4906310445F2F006BE471 /* Security.framework */,
+				4BE4906710445F36006BE471 /* ServiceManagement.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
+				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
+				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D1107320486CEB800E47090 /* VPN.app */,
+				4BE4905D10445E0A006BE471 /* com.kantaris.vpn.VPNHelper */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* SMJobBless */ = {
+			isa = PBXGroup;
+			children = (
+				DA7BB3A2198662F100AE99D4 /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+				DAA88F791983FF15002D1E7D /* VPNHelper */,
+				DAA88F6F1983FA87002D1E7D /* VPNApp */,
+				DAD9A45C199202E600339F47 /* com.kantaris.vpn.VPNHelper copy-Info.plist */,
+			);
+			name = SMJobBless;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
+				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DA7BB3A2198662F100AE99D4 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DA13547219A2FE9F0066AB7E /* vpncore */,
+				DA1F8EEA199DAB7700DC02C1 /* 0.png */,
+				DA1F8EEB199DAB7700DC02C1 /* 2.png */,
+				DA1F8EEC199DAB7700DC02C1 /* 3.png */,
+				DA1F8EED199DAB7700DC02C1 /* 4.png */,
+				DA1F8EEE199DAB7700DC02C1 /* 5.png */,
+				DA1F8EF1199DAB7700DC02C1 /* green3.png */,
+				DA1F8EF2199DAB7700DC02C1 /* gui3.png */,
+				DA1F8EF7199DAB7700DC02C1 /* red3.png */,
+				DA7BB3C01986670300AE99D4 /* Images.xcassets */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		DAA88F6F1983FA87002D1E7D /* VPNApp */ = {
+			isa = PBXGroup;
+			children = (
+				DAD9A49E1992238400339F47 /* MainMenu.xib */,
+				DAD9A49A1992229800339F47 /* VButton.m */,
+				DAD9A4991992229000339F47 /* VButton.h */,
+				DAA88F701983FA87002D1E7D /* main.m */,
+				DAA88F721983FA87002D1E7D /* SMJobBlessAppController.h */,
+				DAA88F731983FA87002D1E7D /* SMJobBlessAppController.m */,
+				DAA88F741983FA87002D1E7D /* VPNApp-Info.plist */,
+			);
+			path = VPNApp;
+			sourceTree = "<group>";
+		};
+		DAA88F791983FF15002D1E7D /* VPNHelper */ = {
+			isa = PBXGroup;
+			children = (
+				DAA88F7A1983FF15002D1E7D /* VPNHelper-Info.plist */,
+				DAA88F7B1983FF15002D1E7D /* VPNHelper-Launchd.plist */,
+				DAA88F7C1983FF15002D1E7D /* VPNHelper.m */,
+			);
+			path = VPNHelper;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4BE4905C10445E0A006BE471 /* com.kantaris.vpn.VPNHelper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4BE4906210445E31006BE471 /* Build configuration list for PBXNativeTarget "com.kantaris.vpn.VPNHelper" */;
+			buildPhases = (
+				4BE4905A10445E0A006BE471 /* Sources */,
+				4BE4905B10445E0A006BE471 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = com.kantaris.vpn.VPNHelper;
+			productName = SMJobBlessHelper;
+			productReference = 4BE4905D10445E0A006BE471 /* com.kantaris.vpn.VPNHelper */;
+			productType = "com.apple.product-type.tool";
+		};
+		8D1107260486CEB800E47090 /* VPN */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "VPN" */;
+			buildPhases = (
+				8D1107290486CEB800E47090 /* Resources */,
+				8D11072C0486CEB800E47090 /* Sources */,
+				8D11072E0486CEB800E47090 /* Frameworks */,
+				4BE49098104463C5006BE471 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4BE4907F1044624F006BE471 /* PBXTargetDependency */,
+			);
+			name = VPN;
+			productInstallPath = "$(HOME)/Applications";
+			productName = SMJobBless;
+			productReference = 8D1107320486CEB800E47090 /* VPN.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "SMJobBless" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 29B97314FDCFA39411CA2CEA /* SMJobBless */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D1107260486CEB800E47090 /* VPN */,
+				4BE4905C10445E0A006BE471 /* com.kantaris.vpn.VPNHelper */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D1107290486CEB800E47090 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA13547319A2FE9F0066AB7E /* vpncore in Resources */,
+				DA1F8EFB199DAB7700DC02C1 /* 0.png in Resources */,
+				DA1F8EFE199DAB7700DC02C1 /* 4.png in Resources */,
+				DAD9A49F1992238500339F47 /* MainMenu.xib in Resources */,
+				DA1F8EFC199DAB7700DC02C1 /* 2.png in Resources */,
+				DA1F8F02199DAB7700DC02C1 /* green3.png in Resources */,
+				DA1F8F08199DAB7700DC02C1 /* red3.png in Resources */,
+				DA1F8F03199DAB7700DC02C1 /* gui3.png in Resources */,
+				DA1F8EFD199DAB7700DC02C1 /* 3.png in Resources */,
+				DA1F8EFF199DAB7700DC02C1 /* 5.png in Resources */,
+				DA7BB3C11986670300AE99D4 /* Images.xcassets in Resources */,
+				DAA88F781983FA87002D1E7D /* VPNApp-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4BE4905A10445E0A006BE471 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAA88F7D1983FF15002D1E7D /* VPNHelper.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D11072C0486CEB800E47090 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAA88F751983FA87002D1E7D /* main.m in Sources */,
+				DAD9A49B1992229800339F47 /* VButton.m in Sources */,
+				DAA88F771983FA87002D1E7D /* SMJobBlessAppController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4BE4907F1044624F006BE471 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4BE4905C10445E0A006BE471 /* com.kantaris.vpn.VPNHelper */;
+			targetProxy = 4BE4907E1044624F006BE471 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		4BE4905F10445E0B006BE471 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INFOPLIST_FILE = "VPNHelper/VPNHelper-Info.plist";
+				INFOPLIST_PREPROCESS = YES;
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-sectcreate",
+					__TEXT,
+					__info_plist,
+					"VPNHelper/VPNHelper-Info.plist",
+					"-sectcreate",
+					__TEXT,
+					__launchd_plist,
+					"VPNHelper/VPNHelper-Launchd.plist",
+				);
+				PRODUCT_NAME = com.kantaris.vpn.VPNHelper;
+			};
+			name = Debug;
+		};
+		4BE4906010445E0B006BE471 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				INFOPLIST_FILE = "VPNHelper/VPNHelper-Info.plist";
+				INFOPLIST_PREPROCESS = YES;
+				INFOPLIST_PREPROCESSOR_DEFINITIONS = SMJOBBLESS_RELEASE;
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-sectcreate",
+					__TEXT,
+					__info_plist,
+					"VPNHelper/VPNHelper-Info.plist",
+					"-sectcreate",
+					__TEXT,
+					__launchd_plist,
+					"VPNHelper/VPNHelper-Launchd.plist",
+				);
+				PRODUCT_NAME = com.kantaris.vpn.VPNHelper;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		C01FCF4B08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COPY_PHASE_STRIP = NO;
+				DEPLOYMENT_POSTPROCESSING = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INFOPLIST_FILE = "VPNApp/VPNApp-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = VPN;
+			};
+			name = Debug;
+		};
+		C01FCF4C08A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = NO;
+				GCC_MODEL_TUNING = G5;
+				INFOPLIST_FILE = "VPNApp/VPNApp-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = VPN;
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PROVISIONING_PROFILE = "";
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PROVISIONING_PROFILE = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4BE4906210445E31006BE471 /* Build configuration list for PBXNativeTarget "com.kantaris.vpn.VPNHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4BE4905F10445E0B006BE471 /* Debug */,
+				4BE4906010445E0B006BE471 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "VPN" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4B08A954540054247B /* Debug */,
+				C01FCF4C08A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "SMJobBless" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}
