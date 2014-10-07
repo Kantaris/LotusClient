@@ -59,11 +59,13 @@
 #include <net/if.h>
 #include <net/route.h>
 #include <syslog.h>
+#include <stdlib.h>
 
 @interface SMJobBlessAppController : NSObject <NSApplicationDelegate, NSAnimationDelegate>{
     NSTextField* _textField;
     int iImageNum;
     int iImageCount;
+    IBOutlet NSWindow *loginWindow;
     
     NSImageView *imageView;
     NSImageView *imageView2;
@@ -84,9 +86,28 @@
     NSString *titleString;
     NSString *serverString;
     NSImage *cityImage;
+    NSMutableData *_responseData;
+    NSString *osTitle;
+    NSString *osServer;
+    NSString *osPort;
+    NSString *osName;
+    NSString *osImage;
+    
     int animState;
     NSTask *runTask;
+    NSTextFieldCell *usernameField;
+    NSSecureTextField *passwordField;
+    NSButton *rememberCheck;
+    NSProgressIndicator *loginProgress;
+    NSTextFieldCell *errorLabel;
+    NSTextField *errorL;
 }
+@property (assign) IBOutlet NSTextFieldCell *usernameField;
+@property (assign) IBOutlet NSSecureTextField *passwordField;
+@property (assign) IBOutlet NSButton *rememberCheck;
+@property (assign) IBOutlet NSProgressIndicator *loginProgress;
+@property (assign) IBOutlet NSTextFieldCell *errorLabel;
+@property (assign) IBOutlet NSTextField *errorL;
 
 @property(nonatomic, retain) NSMutableArray *imgBack;
 @property (assign) IBOutlet NSWindow *window;

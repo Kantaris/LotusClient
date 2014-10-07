@@ -13,6 +13,8 @@
 - (void)mouseExited:(NSEvent *)theEvent;
 - (void)mouseDown:(NSEvent *)ev;
 - (void)mouseUp:(NSEvent *)theEvent;
+- (void)setButtonOn;
+- (void)setButtonOff;
 - (void)createTrackingArea;
 - (void)awakeFromNib;
 @end

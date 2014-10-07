@@ -48,7 +48,16 @@ int state = 0;
     [self setNeedsDisplay];
     [self performClick: self];    
 }
+- (void)setButtonOn{
+    [self setImage:[NSImage imageNamed:@"green3.png"]];
+    state = 1;
+    
+}
 
+- (void)setButtonOff{
+    [self setImage:[NSImage imageNamed:@"red3.png"]];
+    state = 0;
+}
 - (void)createTrackingArea
 {
     NSTrackingAreaOptions focusTrackingAreaOptions = NSTrackingActiveInActiveApp;

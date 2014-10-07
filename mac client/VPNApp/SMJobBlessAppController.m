@@ -17,15 +17,22 @@ xpc_connection_t connection;
 
 
 @implementation SMJobBlessAppController
+@synthesize usernameField;
+@synthesize passwordField;
+@synthesize rememberCheck;
+@synthesize loginProgress;
+@synthesize errorLabel;
+@synthesize errorL;
 @synthesize imgBack;
 @synthesize textField=_textField;
 
 - (void)appendLog:(NSString *)log {
     self.textField.stringValue = [self.textField.stringValue stringByAppendingFormat:@"\n%@", log];
 }
-
+BOOL isSingleServer = NO;
 BOOL shouldterm = NO;
 BOOL isFirst = NO;
+BOOL isConnected = NO;
 /*- (IBAction)testbutton:(NSButton *)sender {
     [self appendLog:@"Button press."];
     // xpc_connection_resume(connection);
@@ -58,6 +65,69 @@ BOOL isFirst = NO;
     
 }*/
 
+- (IBAction)testbutton:(NSButton *)sender {
+    if([sender.title rangeOfString:@"Auto"].location != NSNotFound){
+        isSingleServer = NO;
+        if(isConnected){
+            [btnChange setButtonOff];
+            [self disconnecting];
+        }
+        [btnChange setButtonOn];
+        [self connecting];
+    }
+    else{
+    NSString *str = [[NSString alloc] initWithData:_responseData encoding:NSUTF8StringEncoding];
+    if ([str rangeOfString:sender.title].location == NSNotFound) {
+    } else {
+        NSRange match;
+        NSRange match1;
+        match = [str rangeOfString: sender.title];
+       
+        int location = match.location - 50;
+        if (location > 0) {
+            str = [str substringWithRange: NSMakeRange (match.location-50, str.length - (match.location-50))];
+        }
+        
+        
+        
+        match = [str rangeOfString: @"<title>"];
+        match1 = [str rangeOfString: @"</title>"];
+        osTitle = [[NSString alloc] init];
+        osTitle = [[str substringWithRange: NSMakeRange (match.location+7, match1.location - (match.location+7))] retain];
+        
+        match = [str rangeOfString: @"<name>"];
+        match1 = [str rangeOfString: @"</name>"];
+        NSString *serverName = [str substringWithRange: NSMakeRange (match.location+6, match1.location - (match.location+6))];
+        osName = [[NSString alloc] init];
+        osName = [[@"Connected to " stringByAppendingString:serverName] retain];
+        
+        match = [str rangeOfString: @"<image>"];
+        match1 = [str rangeOfString: @"</image>"];
+        osImage = [[NSString alloc] init];
+        osImage = [[str substringWithRange: NSMakeRange (match.location+7, match1.location - (match.location+7))] retain];
+        
+        
+        match = [str rangeOfString: @"<address>"];
+        match1 = [str rangeOfString: @"</address>"];
+        osServer = [[NSString alloc] init];
+        osServer = [[str substringWithRange: NSMakeRange (match.location+9, match1.location - (match.location+9))] retain];
+        
+        
+        match = [str rangeOfString: @"<port>"];
+        match1 = [str rangeOfString: @"</port>"];
+        osPort = [[NSString alloc] init];
+        osPort = [[str substringWithRange: NSMakeRange (match.location+6, match1.location - (match.location+6))] retain];
+        
+        isSingleServer = YES;
+        if(isConnected){
+            [btnChange setButtonOff];
+            [self disconnecting];
+        }
+         [btnChange setButtonOn];
+        [self connecting];
+    }
+    }
+}
 - (void) taskDidTerminate:(NSNotification *)notification {
     // Note this is called from the background thread, don't update the UI here
     shouldterm = YES;
@@ -146,6 +216,7 @@ BOOL isFirst = NO;
 {
     NSFileHandle *handle = (NSFileHandle *)[notification object];
     NSData *inData = nil;
+    if (isSingleServer == NO) {
     if ((inData = [[notification userInfo] objectForKey:@"NSFileHandleNotificationDataItem"])) {
         NSString *str = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
         if ([str rangeOfString:@"<title>"].location == NSNotFound) {
@@ -169,9 +240,11 @@ BOOL isFirst = NO;
             
             cityImage = [NSImage imageNamed:imageName];
             [self changeBackground: imageView2];
-            
+            isConnected = YES;
             //[self initAnim];
-            [anim startAnimation];        }
+            [anim startAnimation];
+        }
+    }
     }
    //
     [handle readInBackgroundAndNotify] ;
@@ -187,12 +260,31 @@ BOOL isFirst = NO;
 {
     [self quitVPN];
 }
-- (void)applicationDidFinishLaunching:(NSNotification *)notification {
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    // A response has been received, this is where we initialize the instance var you created
+    // so that we can append data to it in the didReceiveData method
+    // Furthermore, this method is called each time there is a redirect so reinitializing it
+    // also serves to clear it
+    _responseData = [[NSMutableData alloc] init];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    // Append the new data to the instance variable you declared
+    [_responseData appendData:data];
+}
+
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection
+                  willCacheResponse:(NSCachedURLResponse*)cachedResponse {
+    // Return nil to indicate not necessary to store a cached response for this connection
+    return nil;
+}
+- (IBAction)loginClicked:(id)sender {
     win = [self window];
     animState = ANIM_NONE;
     titleString = @"Disconnected";
     serverString = @"Not connected to any server";
-  // NSButton *closeButton = [self.window standardWindowButton:NSWindowCloseButton];
+    // NSButton *closeButton = [self.window standardWindowButton:NSWindowCloseButton];
     //[closeButton setTarget:self.window.delegate];
     //[closeButton setAction:@selector(closeThisWindow)];
     //[closeButton setEnabled:YES];
@@ -208,17 +300,111 @@ BOOL isFirst = NO;
     [self initAnim];
     
     // redirect stdin to input pipe file handle
-   // dup2([[inputPipe fileHandleForWriting] fileDescriptor], STDIN_FILENO);
+    // dup2([[inputPipe fileHandleForWriting] fileDescriptor], STDIN_FILENO);
     // curInputHandle is an instance variable of type NSFileHandle
-   
     
-
-
+    
+    
+    
     [self.window setLevel:NSScreenSaverWindowLevel];
+    NSString *ssu = usernameField.stringValue;
+    NSString *ssp = passwordField.stringValue;
+    [errorL setHidden:YES];
+    [loginProgress startAnimation:0];
+    NSString *post = [NSString stringWithFormat:@"Username=%@&Password=%@",ssu,ssp];
+	NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    NSString *postLength = [NSString stringWithFormat:@"%d",[postData length]];
+    NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] init] autorelease];
+    [request setURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://www.lotusvpn.com/login.ashx"]]];
+    [request setHTTPMethod:@"POST"];
+    [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPBody:postData];
     
-	
+    NSURLConnection *conn = [[NSURLConnection alloc]initWithRequest:request delegate:self];
+    if(conn) {
+        NSLog(@"Connection Successful");
+    } else {
+        NSLog(@"Connection could not be made");
+    }
+}
+
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    NSString *xmlstr = [[NSString alloc] initWithData:_responseData encoding:NSUTF8StringEncoding];
+    if ([xmlstr rangeOfString:@"<error>"].location == NSNotFound) {
+        // The request is complete and data has been received
+        // You can parse the stuff in your instance variable now
+        NSRange mz;
+        NSRange mz1;
+        mz = [xmlstr rangeOfString: @"<hash>"];
+        mz1 = [xmlstr rangeOfString: @"</hash>"];
+        NSString *hashString = [xmlstr substringWithRange: NSMakeRange (mz.location+6, mz1.location - (mz.location+6))];
+        NSString *ssu = usernameField.stringValue;
+        NSString *ssp = passwordField.stringValue;
+        if ([rememberCheck state] == NSOnState) {
+            [[NSUserDefaults standardUserDefaults] setValue:ssu forKey:@"email"];
+            [[NSUserDefaults standardUserDefaults] setValue:hashString forKey:@"password"];
+        }
+        else{
+            [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:@"email"];
+            [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:@"password"];
+        }
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [win orderFront:0];
+        [loginWindow close];
+        NSMenu *mainMenu = [[NSApplication sharedApplication] mainMenu];
+        NSMenu *appMenu = [[mainMenu itemAtIndex:2] submenu];
+        [appMenu removeItemAtIndex:0];
+        NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"Auto"
+                                                  action:@selector(testbutton:) keyEquivalent:@""];
     
-   }
+        [item autorelease];
+        [item setTarget:self];
+        [appMenu addItem:item];
+        while ([xmlstr rangeOfString:@"<name>"].location != NSNotFound) {
+    
+            NSRange match;
+            NSRange match1;
+            match = [xmlstr rangeOfString: @"<name>"];
+            match1 = [xmlstr rangeOfString: @"</name>"];
+            NSString *tString = [xmlstr substringWithRange: NSMakeRange (match.location+6, match1.location - (match.location+6))];
+            xmlstr = [xmlstr substringWithRange: NSMakeRange (match1.location+6, xmlstr.length - (match1.location+6))];
+
+            NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:tString
+                                                  action:@selector(testbutton:) keyEquivalent:@""];
+        
+            [item autorelease];
+            [item setTarget:self];
+            [appMenu addItem:item];
+        }
+    }
+    else{
+        [loginProgress stopAnimation:0];
+        [errorL setHidden:NO];
+        [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:@"email"];
+        [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:@"password"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    
+}
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    // The request has failed for some reason!
+    // Check the error var
+}
+
+- (void)applicationDidFinishLaunching:(NSNotification *)notification {
+    [errorL setHidden:YES];
+    [self connectHelper];
+    [self disconnectVPN];
+    NSString *_email = [[NSUserDefaults standardUserDefaults] stringForKey:@"email"];
+    NSString *_password = [[NSUserDefaults standardUserDefaults] stringForKey:@"password"];
+    if(_email && _password){
+        [usernameField setStringValue:_email];
+        [passwordField setStringValue:_password];
+    }
+}
 
 - (BOOL) applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)application
 {
@@ -324,8 +510,15 @@ BOOL isFirst = NO;
     u_int64_t tbits = getBytes();
     u_int64_t bitdiff = (tbits - oldbits) * 8 / 1000;
     oldbits = tbits;
-    NSString *str = [NSString stringWithFormat:@"Download Speed: %d kb/s", bitdiff];
-    [txtDesc setStringValue:str];
+    if (isConnected == NO) {
+        NSString *str = [NSString stringWithFormat:@" "];
+        [txtDesc setStringValue:str];
+
+    }
+    else {
+        NSString *str = [NSString stringWithFormat:@"Download Speed: %d kb/s", bitdiff];
+        [txtDesc setStringValue:str];
+    }
     
    
      // [reader readInBackgroundAndNotify];
@@ -355,6 +548,128 @@ BOOL isFirst = NO;
     return img;
 }
 
+- (void)disconnecting
+{
+    if(runTask != nil && [runTask isRunning]){
+        [runTask terminate];
+    }
+    
+    titleString = @"Disconnected";
+    serverString = @"Not connected to any server";
+    isConnected = NO;
+    [txtTitle setStringValue:titleString];
+    [txtServer setStringValue:serverString];
+    cityImage = [NSImage imageNamed:@"gui3.png"];
+    [self disconnectVPN];
+    [self changeBackground: imageView2];
+    
+    //[self initAnim];
+    [anim startAnimation];
+}
+
+- (void)connectHelper
+{
+    NSError *error = nil;
+    if([[NSFileManager defaultManager] fileExistsAtPath:@"/Library/PrivilegedHelperTools/com.kantaris.vpn.VPNHelper"]) { /* ... */ }
+    else{
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert addButtonWithTitle:@"OK"];
+        //[alert addButtonWithTitle:@"Cancel"];
+        [alert setMessageText:@"This App requires a helper to run"];
+        [alert setInformativeText:@"When clicking OK the helper will be installed"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert runModal];
+        if (![self blessHelperWithLabel:@"com.kantaris.vpn.VPNHelper" error:&error]) {
+            [self appendLog:[NSString stringWithFormat:@"Failed to bless helper. Error: %@", error]];
+            return;
+        }
+    }
+    self.textField.stringValue = @"Helper available.";
+    if(connection == nil){
+        connection = xpc_connection_create_mach_service("com.kantaris.vpn.VPNHelper", NULL, XPC_CONNECTION_MACH_SERVICE_PRIVILEGED);
+        
+        if (!connection) {
+            [self appendLog:@"Failed to create XPC connection."];
+            return;
+        }
+        
+        xpc_connection_set_event_handler(connection, ^(xpc_object_t event) {
+            xpc_type_t type = xpc_get_type(event);
+            
+            if (type == XPC_TYPE_ERROR) {
+                
+                if (event == XPC_ERROR_CONNECTION_INTERRUPTED) {
+                    [self appendLog:@"XPC connection interupted."];
+                    
+                } else if (event == XPC_ERROR_CONNECTION_INVALID) {
+                    [self appendLog:@"XPC connection invalid, releasing."];
+                    xpc_release(connection);
+                    
+                } else {
+                    [self appendLog:@"Unexpected XPC connection error."];
+                }
+                
+            } else {
+                [self appendLog:@"Unexpected XPC connection event."];
+            }
+        });
+        
+        xpc_connection_resume(connection);
+    }
+}
+
+- (void)connecting
+{
+    NSPipe *outputPipe = [NSPipe pipe];
+    reader = [outputPipe fileHandleForReading];
+    [reader readInBackgroundAndNotify];
+    // when my C program hits a scanf
+    NSPipe *pipe = [[NSPipe alloc] init];
+    writer = [pipe fileHandleForWriting];
+    
+    
+    runTask = [[[NSTask alloc] init] autorelease];
+    NSString *exefile = [[[NSBundle mainBundle] resourcePath]
+                         stringByAppendingPathComponent:@"vpncore"];
+    [runTask setLaunchPath: exefile];
+    
+    NSString *exeDir = [[[NSBundle mainBundle] resourcePath]
+                        stringByAppendingPathComponent:@"local"];
+    NSArray *pargs;
+    int rand = 1000 + arc4random_uniform(1000);
+    NSString *myT = [NSString stringWithFormat:@"%d", rand];
+    if(isSingleServer == NO){
+        pargs = [NSArray arrayWithObjects: exeDir, @"-s", @"Auto" ,@"-p", @"443", @"-l", @"1179", @"-k", @"barfoo!", @"-m", @"aes-256-cfb", nil];
+    }
+    else{
+        pargs = [NSArray arrayWithObjects: exeDir, @"-s", osServer ,@"-p", osPort, @"-l", @"1179", @"-k", @"barfoo!", @"-m", @"aes-256-cfb", nil];
+    }
+    [runTask setArguments: pargs];
+    [runTask setStandardInput:pipe];
+    [runTask setStandardOutput:outputPipe];
+    [runTask setStandardError:outputPipe];
+    [runTask launch];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center addObserver: self selector:@selector(stdoutDataAvailable:) name:NSFileHandleReadCompletionNotification object:reader];
+    
+    
+    [self connectHelper];
+    if(isSingleServer){
+        [txtTitle setStringValue:osTitle];
+        [txtServer setStringValue:osName];
+        cityImage = [NSImage imageNamed:osImage];
+        [self changeBackground: imageView2];
+        isConnected = YES;
+        //[self initAnim];
+        [anim startAnimation];
+    }
+    else{
+        titleString = @"Connecting";
+        [txtTitle setStringValue:titleString];
+    }
+    [self connectVPN];
+}
+
 - (IBAction) changeClick : (id) sender
 {
     //[btnChange setImage:[NSImage imageNamed:@"green3.png"]];
@@ -365,97 +680,14 @@ BOOL isFirst = NO;
     
     
     
-    if(btnChange.state == 1){
-        NSPipe *outputPipe = [NSPipe pipe];
-        reader = [outputPipe fileHandleForReading];
-        [reader readInBackgroundAndNotify];
-        // when my C program hits a scanf
-        NSPipe *pipe = [[NSPipe alloc] init];
-        writer = [pipe fileHandleForWriting];
-        
-        
-        runTask = [[[NSTask alloc] init] autorelease];
-        NSString *exefile = [[[NSBundle mainBundle] resourcePath]
-                             stringByAppendingPathComponent:@"vpncore"];
-        [runTask setLaunchPath: exefile];
-        
-        NSString *exeDir = [[[NSBundle mainBundle] resourcePath]
-                            stringByAppendingPathComponent:@"local"];
-        NSArray *pargs;
-        pargs = [NSArray arrayWithObjects: exeDir, @"-s", @"00" ,@"-p", @"8388", @"-l", @"1179", @"-k", @"barfoo!", @"-m", @"aes-256-cfb", nil];
-        [runTask setArguments: pargs];
-        [runTask setStandardInput:pipe];
-        [runTask setStandardOutput:outputPipe];
-        [runTask setStandardError:outputPipe];
-        [runTask launch];
-        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-        [center addObserver: self selector:@selector(stdoutDataAvailable:) name:NSFileHandleReadCompletionNotification object:reader];
-        
-       
-        NSError *error = nil;
-        if([[NSFileManager defaultManager] fileExistsAtPath:@"/Library/PrivilegedHelperTools/com.kantaris.vpn.VPNHelper"]) { /* ... */ }
-        else{
-            NSAlert *alert = [[NSAlert alloc] init];
-            [alert addButtonWithTitle:@"OK"];
-            //[alert addButtonWithTitle:@"Cancel"];
-            [alert setMessageText:@"This App requires a helper to run"];
-            [alert setInformativeText:@"When clicking OK the helper will be installed"];
-            [alert setAlertStyle:NSWarningAlertStyle];
-            [alert runModal];
-            if (![self blessHelperWithLabel:@"com.kantaris.vpn.VPNHelper" error:&error]) {
-                [self appendLog:[NSString stringWithFormat:@"Failed to bless helper. Error: %@", error]];
-                return;
-            }
-        }
-        self.textField.stringValue = @"Helper available.";
-        if(connection == nil){
-            connection = xpc_connection_create_mach_service("com.kantaris.vpn.VPNHelper", NULL, XPC_CONNECTION_MACH_SERVICE_PRIVILEGED);
-        
-            if (!connection) {
-                [self appendLog:@"Failed to create XPC connection."];
-                return;
-            }
-        
-            xpc_connection_set_event_handler(connection, ^(xpc_object_t event) {
-                xpc_type_t type = xpc_get_type(event);
-            
-                if (type == XPC_TYPE_ERROR) {
-                
-                    if (event == XPC_ERROR_CONNECTION_INTERRUPTED) {
-                        [self appendLog:@"XPC connection interupted."];
-                    
-                    } else if (event == XPC_ERROR_CONNECTION_INVALID) {
-                        [self appendLog:@"XPC connection invalid, releasing."];
-                        xpc_release(connection);
-                    
-                    } else {
-                        [self appendLog:@"Unexpected XPC connection error."];
-                    }
-                
-                } else {
-                    [self appendLog:@"Unexpected XPC connection event."];
-                }
-            });
-        
-            xpc_connection_resume(connection);
-        }
-        [self connectVPN];
+    if(!isConnected){
+        [self connecting];
     }
     else{
-        [runTask terminate];
-        titleString = @"Disconnected";
-        serverString = @"Not connected to any server";
-        [txtTitle setStringValue:titleString];
-        [txtServer setStringValue:serverString];
-        cityImage = [NSImage imageNamed:@"gui3.png"];
-        [self disconnectVPN];
-        [self changeBackground: imageView2];
-        
-        //[self initAnim];
-        [anim startAnimation];
+        [self disconnecting];
         
     
-    }
+        }
     }
     
 

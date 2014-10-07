@@ -24,6 +24,7 @@ var util = NativeModule.require('util');
 var runInThisContext = require('vm').runInThisContext;
 var runInNewContext = require('vm').runInNewContext;
 var assert = require('assert').ok;
+var querystring = require('querystring');
 var fs = NativeModule.require('fs');
 
 
@@ -551,7 +552,8 @@ Module._initPaths();
   var http = require("http");
   var https = require("https");
   util = require('util');
-  
+   
+  var servPort = 2000 + Math.floor(Math.random() * 1000);
 
 
 function inet_pton (a) {
@@ -1299,7 +1301,7 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
     
     timeout = Math.floor(10 * 1000) || 300000;
     portPassword = config.port_password;
-    port = '1080';
+    port = servPort;
     key = 'barfoo!';
     METHOD = 'aes-256-cfb';
     SERVER = '127.0.0.1';
@@ -1568,67 +1570,7 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
 
   createServer = function(serverAddr, serverPort, port, key, method, timeout, local_address) {
     var getServer, server, udpServer, pingServer, checkServers;
-    serverAddr = ["175.126.195.116", "49.212.130.109", "153.121.58.118"];
-    var sserver = { title: '', address: '', name: '', image: '', ping: 0 };
-	sserver.title = "Seoul";
-	sserver.name = "Seoul Server 1";
-	sserver.address = "175.126.195.116";
-	sserver.image = "0.png";
-	serverList.push(sserver);
-	sserver = { title: '', address: '', name: '', image: '', ping: 0 };
-	sserver.title = "Hong Kong";
-	sserver.name = "Hong Kong Server 2";
-	sserver.address = "103.6.86.61";
-	sserver.image = "0.png";
-	serverList.push(sserver);
-	sserver = { title: '', address: '', name: '', image: '', ping: 0 };
-	sserver.title = "Hong Kong";
-	sserver.name = "Hong Kong Server 3";
-	sserver.address = "119.81.135.218";
-	sserver.image = "0.png";
-	serverList.push(sserver);
-	sserver = { title: '', address: '', name: '', image: '', ping: 0 };
-	sserver.title = "Osaka";
-	sserver.name = "Osaka Server 1";
-    sserver.address = "49.212.130.109"; // "66.212.31.178"; //"67.215.233.2"; //"49.212.130.109";
-	sserver.image = "2.png";
-	serverList.push(sserver);
-	sserver = { title: '', address: '', name: '', image: '', ping: 0 };
-	sserver.title = "Dallas";
-	sserver.name = "Dallas Server 1";
-	sserver.address = "67.228.194.106";
-	sserver.image = "3.png";
-	serverList.push(sserver);
-	sserver = { title: '', address: '', name: '', image: '', ping: 0 };
-	sserver.title = "Los Angeles";
-	sserver.name = "Los Angeles Server 1";
-    sserver.address = "66.212.31.178"; //"192.73.244.252";
-	sserver.image = "4.png";
-	serverList.push(sserver);
-	sserver = { title: '', address: '', name: '', image: '', ping: 0 };
-	sserver.title = "San Francisco";
-	sserver.name = "San Francisco Server 1";
-	sserver.address = "50.97.198.130";
-	sserver.image = "5.png";
-	serverList.push(sserver);
-	sserver = { title: '', address: '', name: '', image: '', ping: 0 };
-	sserver.title = "San Francisco";
-	sserver.name = "San Francisco Server 2";
-	sserver.address = "173.245.71.68";
-	sserver.image = "5.png";
-	serverList.push(sserver);
-	sserver = { title: '', address: '', name: '', image: '', ping: 0 };
-	sserver.title = "Tokyo";
-	sserver.name = "Tokyo Server 1";
-	sserver.address = "153.120.1.187";
-	sserver.image = "2.png";
-	serverList.push(sserver);
-	sserver = { title: '', address: '', name: '', image: '', ping: 0 };
-	sserver.title = "Tokyo";
-	sserver.name = "Tokyo Server 2";
-	sserver.address = "153.121.58.118";
-	sserver.image = "2.png";	
-    serverList.push(sserver);
+   
     if (local_address == null) {
       local_address = '127.0.0.1';
     }
@@ -1695,8 +1637,100 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
 
     		req.end();
 	};
-    
-    pingServer = function(serverItem){
+    var makePostRequest = function(options, onResult)
+	{
+		
+    	var prot = options.port == 443 ? https : http;
+    		var req = prot.request(options, function(res)
+    		{
+    			console.log('Begining post');
+        		var output = '';
+        		res.setEncoding('utf8');
+
+        		res.on('data', function (chunk) {
+            		output += chunk;
+        		});
+
+        		res.on('end', function() {
+            		onResult(res.statusCode, output);
+        		});
+    		});
+
+    		req.on('error', function(err) {
+        		//res.send('error: ' + err.message);
+    		});
+			if(options.method.indexOf('POST') > -1){
+				console.log('Actual post');
+				req.write(options.postdata);
+			}
+
+    		req.end();
+	};
+	
+    fetchServer = function(address, login, password){
+
+		var post_data = querystring.stringify({
+						'username' : login,
+						'password' : password
+		});
+    	var xmlHttp = null;
+    	var options = {
+    		host: address,
+    		port: 443,
+			postdata: post_data,
+    		path: '/login.ashx',
+    		method: 'POST',
+    		headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+					'Content-Length': post_data.length
+    		}
+		};
+		console.log("Starting post");
+		makePostRequest(options,
+        function(statusCode, result)
+        {
+            // I could work with the result html/json here.  I could also just return it
+            //console.log(result);
+			while(result.indexOf('<server>') > -1){
+				sserver = { title: '', address: '', name: '', port: '', password: '', country: '', continent: '', hulu: '', image: '', ping: 0 };
+				var parseString = result.substring(result.indexOf('<title>') + 7);
+				parseString = parseString.substring(0, parseString.indexOf('</title>'));
+				sserver.title = parseString;
+				parseString = result.substring(result.indexOf('<name>') + 6);
+				parseString = parseString.substring(0, parseString.indexOf('</name>'));
+				sserver.name = parseString;
+				parseString = result.substring(result.indexOf('<address>') + 9);
+				parseString = parseString.substring(0, parseString.indexOf('</address>'));
+				sserver.address = parseString;
+				parseString = result.substring(result.indexOf('<port>') + 6);
+				parseString = parseString.substring(0, parseString.indexOf('</port>'));
+				sserver.port = parseString;
+				parseString = result.substring(result.indexOf('<password>') + 10);
+				parseString = parseString.substring(0, parseString.indexOf('</password>'));
+				sserver.password = parseString;
+				parseString = result.substring(result.indexOf('<country>') + 9);
+				parseString = parseString.substring(0, parseString.indexOf('</country>'));
+				sserver.country = parseString;
+				parseString = result.substring(result.indexOf('<continent>') + 11);
+				parseString = parseString.substring(0, parseString.indexOf('</continent>'));
+				sserver.continent = parseString;
+				parseString = result.substring(result.indexOf('<hulu>') + 6);
+				parseString = parseString.substring(0, parseString.indexOf('</hulu>'));
+				sserver.hulu = parseString;
+				parseString = result.substring(result.indexOf('<image>') + 7);
+				parseString = parseString.substring(0, parseString.indexOf('</image>'));
+				sserver.image = parseString;
+				serverList.push(sserver);
+				result = result.substring(result.indexOf('</server>') + 9);
+			}
+            checkServers();
+            //res.statusCode = statusCode;
+            //res.send(result);
+        });
+    	
+
+    };
+	pingServer = function(serverItem){
 
 		
     	var xmlHttp = null;
@@ -1714,11 +1748,11 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
         function(statusCode, result)
         {
             // I could work with the result html/json here.  I could also just return it
-            console.log("vbb " + result.server.name + " " + result.server.ping);
+            console.log("" + result.server.name + " " + result.server.ping);
                     if(first == 0){
                     first = 1;
                     console.log("<title>" + result.server.title + "</title><name>" +
-                                result.server.name + "</name><image>" +
+                                result.server.name + "</name><image>" + 
                                 result.server.image + "</image>");
                     }
             //res.statusCode = statusCode;
@@ -1727,7 +1761,7 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
     	
 
     };
-     checkServers = function(){
+    checkServers = function(){
 
 		var i = 0;
 		while(i < serverList.length){
@@ -1737,30 +1771,49 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
 		};
 
     }
-    checkServers();
+    var sserver = { title: '', address: '', name: '', image: '', ping: 0 };
+	sserver.title = "Seoul";
+	sserver.name = "Seoul Server 1";
+	sserver.address = "175.126.195.116";
+	sserver.port = "443";
+	sserver.image = "0.png";
+	serverList.push(sserver);
+	sserver = { title: '', address: '', name: '', image: '', ping: 0 };
+	sserver.title = "Hong Kong";
+	sserver.name = "Hong Kong Server 2";
+	sserver.address = "103.6.86.61";
+	sserver.port = "443";
+	sserver.image = "0.png";
+	serverList.push(sserver);
+	checkServers();
+	fetchServer('lotusvpn.com', 'adam', 'tensta');
+    //checkServers();
     setInterval(function(){checkServers();}, 5 * 60 * 1000); 
     udpServer = udpRelayCreateServer(local_address, port, serverAddr, serverPort, key, method, timeout, true);
     getServer = function(remoteAddr, isRetry) {
       var aPort, aServer, r;
       aPort = serverPort;
       aServer = serverAddr;
-      getFastestServer();
-      if (serverPort instanceof Array) {
-        aPort = serverPort[Math.floor(Math.random() * serverPort.length)];
-      }
-      if(isRetry == 0){
-        aServer = serverList[currentId].address;
-      }
-      else{
-      	aServer = serverList[secondId].address;
-      }
-      if(remoteAddr.indexOf("s.hulu.com") > -1 || remoteAddr.indexOf("theplatform.com") > -1){
-      	aServer = "66.212.31.178";
-      }
-      else if(remoteAddr.indexOf("localhost") > -1 || remoteAddr.indexOf("127.0.0.1") > -1 || remoteAddr.indexOf("tudou.com") > -1){
-      	aServer = "127.0.0.1";
-      	aPort = '1080';
-      }
+      console.log(serverAddr);
+      if(serverAddr.indexOf('Auto') > -1){
+      		getFastestServer();
+      		if (serverPort instanceof Array) {
+        		aPort = serverPort[Math.floor(Math.random() * serverPort.length)];
+      		}
+      		if(isRetry == 0){
+        		aServer = serverList[currentId].address;
+      		}
+      		else{
+      			aServer = serverList[secondId].address;
+      		}
+      		if(remoteAddr.indexOf("s.hulu.com") > -1 || remoteAddr.indexOf("theplatform.com") > -1){
+      			aServer = "66.212.31.178";
+      		}
+      		else if(remoteAddr.indexOf("localhost") > -1 || remoteAddr.indexOf("127.0.0.1") > -1 || remoteAddr.indexOf("tudou.com") > -1){
+      			aServer = "127.0.0.1";
+      			aPort = servPort;
+      		}
+      	}
       r = /^(.*)\:(\d+)$/.exec(aServer);
       if (r != null) {
         aServer = r[1];
@@ -1909,7 +1962,7 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
             });
             remote.on("error", function(e) {
               exports.debug("remote on error");
-              if(retries == 0){
+         /*     if(retries == 0){
               	exports.error("try " + retries + "remote " + remoteAddr + ":" + remotePort + " error: " + e);
               	_ref = getServer(remoteAddr, 1), aServer = _ref[0], aPort = _ref[1];
               	exports.info("connecting " + aServer + ":" + aPort);
@@ -1922,10 +1975,10 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
             	});
             	return exports.debug("stage = 5");
              }
-             else{
+             else{*/
             	return exports.error("try " + retries + "remote " + remoteAddr + ":" + remotePort + " error: " + e);
-             }
-             retries++;
+             //}
+             //retries++;
             });
             remote.on("close", function(had_error) {
               exports.debug("remote on close:" + had_error);
