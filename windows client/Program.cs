@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using vpngui;
 namespace WindowsFormsApplication1
 {
 	internal static class Program
@@ -9,7 +10,7 @@ namespace WindowsFormsApplication1
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new Form1());
+			Application.Run(new Login());
 		}
 	}
 }

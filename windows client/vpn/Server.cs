@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Net;
+using vpngui.WindowsFormsApplication1;
 namespace vpn
 {
 	internal class Server
@@ -12,7 +13,7 @@ namespace vpn
 		private bool hasExit = false;
 		public string title;
 		public string name;
-		public Bitmap image;
+		public string image;
 		public string address;
 		public string password;
 		public string port;
@@ -20,6 +21,11 @@ namespace vpn
 		public string country;
 		public int ping = -1;
 		public bool isConnected = false;
+
+        public delegate void ChangeServerEventHandler(object sender, SessionStats e);
+        public event ChangeServerEventHandler ChangeServer;
+ 
+
 		public void Connect()
 		{
 			this.startSSH();
@@ -61,9 +67,9 @@ namespace vpn
 			{
 				"\"",
 				tempPath,
-				"vpnstuff\\sslocal\" -s ",
+				"vpnstuff\\sslocacl\" -s ",
 				this.address,
-				" -p 8388 -l ",
+				" -p 443 -l ",
 				this.port,
 				" -k ",
 				this.password,
@@ -131,8 +137,29 @@ namespace vpn
 			this.hasExit = false;
 			string data = e.Data;
 			Server.WriteErrorResponse(data);
-			if (e.Data != null && e.Data.Contains("Last login:"))
+			if (data != null && data.Contains("<title>"))
 			{
+                string siString = data.Substring(data.IndexOf("<title>"));
+               // siString = siString.Substring(0, siString.IndexOf("</server>"));
+               // data = data.Substring(0, siString.IndexOf("</server>"));
+
+                //string sId = siString.Substring(siString.IndexOf("<id>") + 4);
+                //sId = sId.Substring(sId.IndexOf("</id>"));
+
+                string sTitle = siString.Substring(siString.IndexOf("<title>") + 7);
+                title = sTitle.Substring(0, sTitle.IndexOf("</title>"));
+
+                string sName = siString.Substring(siString.IndexOf("<name>") + 6);
+                name = sName.Substring(0, sName.IndexOf("</name>"));
+
+                string sImage = siString.Substring(siString.IndexOf("<image>") + 7);
+                image = sImage.Substring(0, sImage.IndexOf("</image>"));
+                ChangeServer(this, null);
+              //  string sContinent = siString.Substring(siString.IndexOf("<continent>") + 11);
+              //  sContinent = sContinent.Substring(sContinent.IndexOf("</continent>"));
+
+              //  string sPing = siString.Substring(siString.IndexOf("<ping>") + 6);
+              //  sPing = sPing.Substring(sPing.IndexOf("</ping>"));
 			}
 		}
 	}

@@ -13,6 +13,7 @@ using vpngui.Properties;
 using vpngui.WindowsFormsApplication1;
 using vpn;
 using System.Diagnostics;
+using vpngui;
 namespace WindowsFormsApplication1
 {
 	public class MainControl : UserControl
@@ -32,6 +33,17 @@ namespace WindowsFormsApplication1
 			Connecting,
 			Connected
 		}
+
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem modeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openWebToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openVPNToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem stealthVPNToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem serversToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem autoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+
 		private Bitmap bmp = null;
 		private Bitmap red = null;
 		private Bitmap redT = null;
@@ -57,6 +69,7 @@ namespace WindowsFormsApplication1
 		private Timer timerFadeIn;
 		private Timer speedTimer;
 		private Timer serverTimer;
+        private List<ServerDetails> serverList = new List<ServerDetails>();
       //  StatsForm sf;
 		public MainControl()
 		{
@@ -117,23 +130,14 @@ namespace WindowsFormsApplication1
            // sf.Show();
            // sf.TopMost = true;
 			this.fproxy.ServerChangeEvent += new System.EventHandler(this.fproxy_ServerChangeEvent);
-            this.fproxy.BeginRequest += new FProxy.BeginRequestEventHandler(fproxy_BeginRequest);
-            this.fproxy.BeginResponse += new FProxy.BeginResponseEventHandler(fproxy_BeginResponse);
-            this.fproxy.BeginError += new FProxy.BeginErrorEventHandler(fproxy_BeginError);
+          
 			string tempPath = System.IO.Path.GetTempPath();
 			System.IO.Directory.CreateDirectory(tempPath + "vpnstuff\\");
-			System.IO.Directory.CreateDirectory(tempPath + "vpnstuff\\lib\\");
 			if (!System.IO.File.Exists(tempPath + "vpnstuff\\node.dll"))
 			{
-				System.IO.File.WriteAllBytes(tempPath + "vpnstuff\\node.dll", Resources.node);
+				System.IO.File.WriteAllBytes(tempPath + "vpnstuff\\node.dll", Resources.node1);
 			}
-			System.IO.File.WriteAllBytes(tempPath + "vpnstuff\\sslocal", Resources.sslocal);
-			System.IO.File.WriteAllText(tempPath + "vpnstuff\\lib\\encrypt.js", Resources.encrypt);
-			System.IO.File.WriteAllText(tempPath + "vpnstuff\\lib\\inet.js", Resources.inet);
-			System.IO.File.WriteAllText(tempPath + "vpnstuff\\lib\\local.js", Resources.local);
-			System.IO.File.WriteAllText(tempPath + "vpnstuff\\lib\\merge_sort.js", Resources.merge_sort);
-			System.IO.File.WriteAllText(tempPath + "vpnstuff\\lib\\udprelay.js", Resources.udprelay);
-			System.IO.File.WriteAllText(tempPath + "vpnstuff\\lib\\utils.js", Resources.utils);
+			
 			if (System.IO.File.Exists(Application.StartupPath + "\\font\\CaviarDreams.ttf"))
 			{
 				this.family = MainControl.LoadFontFamily(Application.StartupPath + "\\font\\CaviarDreams.ttf", out this.fonts);
@@ -154,6 +158,7 @@ namespace WindowsFormsApplication1
 					}
 				}
 			}
+           // this.timerFadeIn.Start();
 		}
 
         void fproxy_BeginError(object sender, SessionStats e)
@@ -172,33 +177,39 @@ namespace WindowsFormsApplication1
         }
 		private void fproxy_ServerChangeEvent(object sender, System.EventArgs e)
 		{
-			this.connectionString = "Connected to " + this.fproxy.currentAsiaServer.name;
-			this.titleString = this.fproxy.currentAsiaServer.title;
-			if (this.serverImage != null)
-			{
-				this.previousImage = this.serverImage;
-			}
-			this.serverImage = this.fproxy.currentAsiaServer.image;
-			for (int i = 0; i < 25; i++)
-			{
-				this.sImg[i] = this.serverImage;
-			}
-			for (int i = 0; i < 25; i++)
-			{
-				this.sImg[i] = this.SetImageOpacity(this.serverImage, (float)i / 25f);
-			}
-			this.networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
-			this.oldValue = 0L;
-			for (int i = 0; i < this.networkInterfaces.Length; i++)
-			{
-				this.oldValue += this.networkInterfaces[i].GetIPv4Statistics().BytesReceived / 1000L * 8L;
-			}
-			this.fadeIn = 0;
-			this.bs = MainControl.buttonStatus.Connected;
-			this.cs = MainControl.connectionStatus.Connected;
-			this.timerFadeIn.Start();
-			this.speedTimer.Start();
+            updateServer();
+            
 		}
+
+        private void updateServer()
+        {
+            this.connectionString = "Connected to " + this.fproxy.server.name;
+            this.titleString = this.fproxy.server.title;
+            if (this.serverImage != null)
+            {
+                this.previousImage = this.serverImage;
+            }
+            this.serverImage = new Bitmap(Image.FromFile(Application.StartupPath + "\\img\\" + this.fproxy.server.image));
+            for (int i = 0; i < 25; i++)
+            {
+                this.sImg[i] = this.serverImage;
+            }
+            for (int i = 0; i < 25; i++)
+            {
+                this.sImg[i] = this.SetImageOpacity(this.serverImage, (float)i / 25f);
+            }
+            this.networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+            this.oldValue = 0L;
+            for (int i = 0; i < this.networkInterfaces.Length; i++)
+            {
+                this.oldValue += this.networkInterfaces[i].GetIPv4Statistics().BytesReceived / 1000L * 8L;
+            }
+            this.fadeIn = 0;
+            this.bs = MainControl.buttonStatus.Connected;
+            this.cs = MainControl.connectionStatus.Connected;
+            this.timerFadeIn.Start();
+            this.speedTimer.Start();
+        }
 		public void close()
 		{
 			if (this.fproxy != null)
@@ -249,7 +260,7 @@ namespace WindowsFormsApplication1
 				{
 					e.Graphics.DrawImage(this.previousImage, 0, 0, this.previousImage.Width, this.previousImage.Height);
 				}
-				e.Graphics.DrawImage(this.sImg[this.fadeIn], 0, 0, this.serverImage.Width, this.serverImage.Height);
+                e.Graphics.DrawImage(this.sImg[this.fadeIn], 0, 0, sImg[this.fadeIn].Width, sImg[this.fadeIn].Height);
 			}
 			if (this.bs == MainControl.buttonStatus.Connected)
 			{
@@ -297,6 +308,8 @@ namespace WindowsFormsApplication1
 					this.titleString = "Disconnected";
 					this.bs = MainControl.buttonStatus.Disconnected;
 					this.cs = MainControl.connectionStatus.Disconnected;
+                    this.serverImage = null;
+                    this.previousImage = null;
 					if (this.fproxy != null)
 					{
 						this.fproxy.DoQuit();
@@ -307,11 +320,23 @@ namespace WindowsFormsApplication1
 				{
 					if (this.bs == MainControl.buttonStatus.Disconnected || (this.bs == MainControl.buttonStatus.Neutral && this.cs == MainControl.connectionStatus.Disconnected))
 					{
+                        this.bs = MainControl.buttonStatus.Connected;
 						this.start();
 					}
 				}
 				this.Refresh();
 			}
+            else if (e.Y > this.Height - 30)
+            {
+                if (!menuStrip1.Visible)
+                {
+                    menuStrip1.Show();
+                }
+                else
+                {
+                    menuStrip1.Hide();
+                }
+            }
 		}
 		private void start()
 		{
@@ -394,10 +419,7 @@ namespace WindowsFormsApplication1
 			this.oldValue = num;
 			this.Refresh();
 		}
-		private void serverTimer_Tick(object sender, System.EventArgs e)
-		{
-			this.fproxy.sortServers();
-		}
+		
 		protected override void Dispose(bool disposing)
 		{
 			if (disposing && this.components != null)
@@ -417,14 +439,179 @@ namespace WindowsFormsApplication1
 			this.timerFadeIn.Tick += new System.EventHandler(this.timerFadeIn_Tick);
 			this.speedTimer.Interval = 1000;
 			this.speedTimer.Tick += new System.EventHandler(this.speedTimer_Tick);
-			this.serverTimer.Interval = 100000;
-			this.serverTimer.Tick += new System.EventHandler(this.serverTimer_Tick);
+
 			base.AutoScaleDimensions = new SizeF(6f, 13f);
 			base.AutoScaleMode = AutoScaleMode.Font;
 			base.Name = "MainControl";
 			base.MouseDown += new MouseEventHandler(this.MainControl_MouseDown);
 			base.MouseMove += new MouseEventHandler(this.MainControl_MouseMove);
+
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.modeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openWebToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openVPNToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stealthVPNToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.serversToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.autoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuStrip1.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.modeToolStripMenuItem,
+            this.serversToolStripMenuItem,
+            this.settingsToolStripMenuItem,
+            this.aboutToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(284, 24);
+            this.menuStrip1.TabIndex = 1;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // modeToolStripMenuItem
+            // 
+            this.modeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openWebToolStripMenuItem,
+            this.openVPNToolStripMenuItem,
+            this.stealthVPNToolStripMenuItem});
+            this.modeToolStripMenuItem.Name = "modeToolStripMenuItem";
+            this.modeToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
+            this.modeToolStripMenuItem.Text = "Mode";
+            // 
+            // openWebToolStripMenuItem
+            // 
+            this.openWebToolStripMenuItem.Name = "openWebToolStripMenuItem";
+            this.openWebToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.openWebToolStripMenuItem.Text = "OpenWeb+";
+            // 
+            // openVPNToolStripMenuItem
+            // 
+            this.openVPNToolStripMenuItem.Name = "openVPNToolStripMenuItem";
+            this.openVPNToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.openVPNToolStripMenuItem.Text = "OpenVPN";
+            // 
+            // stealthVPNToolStripMenuItem
+            // 
+            this.stealthVPNToolStripMenuItem.Name = "stealthVPNToolStripMenuItem";
+            this.stealthVPNToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.stealthVPNToolStripMenuItem.Text = "StealthVPN";
+            // 
+            // serversToolStripMenuItem
+            // 
+            this.serversToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.autoToolStripMenuItem});
+            this.serversToolStripMenuItem.Name = "serversToolStripMenuItem";
+            this.serversToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
+            this.serversToolStripMenuItem.Text = "Servers";
+            // 
+            // autoToolStripMenuItem
+            // 
+            this.autoToolStripMenuItem.Name = "autoToolStripMenuItem";
+            this.autoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.autoToolStripMenuItem.Text = "Auto";
+            this.autoToolStripMenuItem.Click += new EventHandler(autoToolStripMenuItem_Click);
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.settingsToolStripMenuItem.Text = "Settings";
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
+            this.aboutToolStripMenuItem.Text = "About";
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.Hide();
+            this.Controls.Add(this.menuStrip1);
 			base.ResumeLayout(false);
 		}
-	}
+
+        void autoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < serversToolStripMenuItem.DropDownItems.Count; i++)
+            {
+                ((System.Windows.Forms.ToolStripMenuItem)serversToolStripMenuItem.DropDownItems[i]).Checked = false;
+            }
+            ((System.Windows.Forms.ToolStripMenuItem)sender).Checked = true;
+            this.serverImage = null;
+            if (this.fproxy != null)
+            {
+                this.fproxy.DoQuit();
+            }
+            fproxy.connect();
+        }
+
+        internal void setServerXml(string result)
+        {
+            while(result.IndexOf("<server>") > -1){
+				var sserver = new ServerDetails();
+				var parseString = result.Substring(result.IndexOf("<title>") + 7);
+				parseString = parseString.Substring(0, parseString.IndexOf("</title>"));
+				sserver.title = parseString;
+				parseString = result.Substring(result.IndexOf("<name>") + 6);
+				parseString = parseString.Substring(0, parseString.IndexOf("</name>"));
+				sserver.name = parseString;
+				parseString = result.Substring(result.IndexOf("<address>") + 9);
+				parseString = parseString.Substring(0, parseString.IndexOf("</address>"));
+				sserver.address = parseString;
+				parseString = result.Substring(result.IndexOf("<port>") + 6);
+				parseString = parseString.Substring(0, parseString.IndexOf("</port>"));
+				sserver.port = parseString;
+				parseString = result.Substring(result.IndexOf("<password>") + 10);
+				parseString = parseString.Substring(0, parseString.IndexOf("</password>"));
+				sserver.password = parseString;
+				parseString = result.Substring(result.IndexOf("<country>") + 9);
+				parseString = parseString.Substring(0, parseString.IndexOf("</country>"));
+				sserver.country = parseString;
+				parseString = result.Substring(result.IndexOf("<continent>") + 11);
+				parseString = parseString.Substring(0, parseString.IndexOf("</continent>"));
+				sserver.continent = parseString;
+				parseString = result.Substring(result.IndexOf("<hulu>") + 6);
+				parseString = parseString.Substring(0, parseString.IndexOf("</hulu>"));
+				sserver.hulu = parseString;
+				parseString = result.Substring(result.IndexOf("<image>") + 7);
+				parseString = parseString.Substring(0, parseString.IndexOf("</image>"));
+				sserver.image = parseString;
+				serverList.Add(sserver);
+                System.Windows.Forms.ToolStripMenuItem item = new System.Windows.Forms.ToolStripMenuItem();
+                item.Size = new System.Drawing.Size(152, 22);
+                item.Text = sserver.name;
+                
+                item.Click += new EventHandler(item_Click);
+                serversToolStripMenuItem.DropDownItems.Add(item);
+				result = result.Substring(result.IndexOf("</server>") + 9);
+			}
+            
+            
+        }
+
+        void item_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < serversToolStripMenuItem.DropDownItems.Count; i++)
+            {
+                ((System.Windows.Forms.ToolStripMenuItem)serversToolStripMenuItem.DropDownItems[i]).Checked = false;
+            }
+            ((System.Windows.Forms.ToolStripMenuItem)sender).Checked = true;
+            for (int i = 0; i < serverList.Count; i++){
+                string serverName = ((System.Windows.Forms.ToolStripMenuItem)sender).Text;
+                if(serverName.Equals(serverList[i].name)){
+                     
+                     this.serverImage = null;
+                     if (this.fproxy != null)
+                     {
+                         this.fproxy.DoQuit();
+                     }
+                     fproxy.connectServer(serverList[i]);
+                     updateServer();
+                     break;
+                }
+            }
+           
+        }
+    }
 }
