@@ -33,7 +33,12 @@ namespace WindowsFormsApplication1
 			Connecting,
 			Connected
 		}
-
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem modeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openWebToolStripMenuItem;
@@ -43,6 +48,7 @@ namespace WindowsFormsApplication1
         private System.Windows.Forms.ToolStripMenuItem autoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+
 
 		private Bitmap bmp = null;
 		private Bitmap red = null;
@@ -69,15 +75,93 @@ namespace WindowsFormsApplication1
 		private Timer timerFadeIn;
 		private Timer speedTimer;
 		private Timer serverTimer;
+        int fadeInProgress = 0;
+        bool hasLoggedIn = true; //false;  
+        private OpenVPN openvpn = new OpenVPN();
+        enum MODE 
+        {
+            OPENWEB = 0,
+            OPENVPN,
+            STEALTHVPN
+        };
+        MODE mode = MODE.OPENWEB;
         private List<ServerDetails> serverList = new List<ServerDetails>();
       //  StatsForm sf;
 		public MainControl()
 		{
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
 			this.InitializeComponent();
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(12, 260);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(216, 20);
+            this.textBox1.TabIndex = 0;
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(12, 300);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(216, 20);
+            this.textBox2.TabIndex = 1;
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(12, 325);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(94, 17);
+            this.checkBox1.TabIndex = 2;
+            this.checkBox1.Text = "Remember me";
+            this.checkBox1.BackColor = Color.White;
+
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(9, 230);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(58, 13);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "Username:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(9, 270);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(56, 13);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "Password:";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(9, 144);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(0, 13);
+            this.label3.TabIndex = 6;
+           // this.Controls.Add(this.label3);
+           // this.Controls.Add(this.label2);
+           // this.Controls.Add(this.label1);
+           // this.Controls.Add(this.textBox2);
+           // this.Controls.Add(this.textBox1);
+           // this.Controls.Add(this.checkBox1);
 			base.SetStyle(ControlStyles.UserPaint, true);
 			base.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
 			base.SetStyle(ControlStyles.DoubleBuffer, true);
 			this.fproxy = new FProxy();
+            this.MouseEnter += new EventHandler(MainControl_MouseHover);
+            this.MouseHover += new EventHandler(MainControl_MouseHover);
+            this.MouseLeave += new EventHandler(MainControl_MouseLeave);
+            menuStrip1.MouseLeave += new EventHandler(MainControl_MouseLeave);
+            openvpn.StatusUpdate += new OpenVPN.StatusEventHandler(openvpn_StatusUpdate);
          //   sf = new StatsForm();
             try
             {
@@ -133,9 +217,9 @@ namespace WindowsFormsApplication1
           
 			string tempPath = System.IO.Path.GetTempPath();
 			System.IO.Directory.CreateDirectory(tempPath + "vpnstuff\\");
-			if (!System.IO.File.Exists(tempPath + "vpnstuff\\node.dll"))
+			if (!System.IO.File.Exists(tempPath + "vpnstuff\\vpncore.dll"))
 			{
-				System.IO.File.WriteAllBytes(tempPath + "vpnstuff\\node.dll", Resources.node1);
+				System.IO.File.WriteAllBytes(tempPath + "vpnstuff\\vpncore.dll", Resources.node);
 			}
 			
 			if (System.IO.File.Exists(Application.StartupPath + "\\font\\CaviarDreams.ttf"))
@@ -161,20 +245,48 @@ namespace WindowsFormsApplication1
            // this.timerFadeIn.Start();
 		}
 
-        void fproxy_BeginError(object sender, SessionStats e)
+        void MainControl_MouseEnter(object sender, EventArgs e)
         {
-           // sf.modifyRow(e);
+            throw new NotImplementedException();
         }
 
-        void fproxy_BeginResponse(object sender, SessionStats e)
+      
+
+     
+
+        void MainControl_MouseLeave(object sender, EventArgs e)
         {
-          //  sf.modifyRow(e);
+            bool mouse_on_control = false;
+            foreach (Control c in Controls)
+                mouse_on_control |= c.RectangleToScreen(c.ClientRectangle).Contains(Cursor.Position);
+            if (!mouse_on_control)
+            {
+                if (menuStrip1.Visible)
+                {
+                    if (!menuStrip1.ContainsFocus)
+                    {
+                        menuStrip1.Hide();
+                    }
+                }
+            }
         }
 
-        void fproxy_BeginRequest(object sender, vpngui.WindowsFormsApplication1.SessionStats e)
+        void MainControl_MouseHover(object sender, EventArgs e)
         {
-         //   sf.addRow(e);
+            if (!menuStrip1.Visible)
+            {
+                menuStrip1.Show();
+            }
+          
         }
+
+        void openvpn_StatusUpdate(object sender, object[] es)
+        {
+            connectionString = (string)es[0];
+            fadeInProgress = (int)((long)es[1] / 40);
+        }
+
+   
 		private void fproxy_ServerChangeEvent(object sender, System.EventArgs e)
 		{
             updateServer();
@@ -212,10 +324,17 @@ namespace WindowsFormsApplication1
         }
 		public void close()
 		{
-			if (this.fproxy != null)
-			{
-				this.fproxy.DoQuit();
-			}
+            if (mode == MODE.OPENWEB)
+            {
+                if (this.fproxy != null)
+                {
+                    this.fproxy.DoQuit();
+                }
+            }
+            else
+            {
+                openvpn.Disconnect(true);
+            }
 		}
 		public static FontFamily LoadFontFamily(string fileName, out PrivateFontCollection fontCollection)
 		{
@@ -236,20 +355,22 @@ namespace WindowsFormsApplication1
 			Rectangle rect = new Rectangle(0, 253, this.bmp.Width, 80);
 			e.Graphics.FillRectangle(brush2, rect);
 			Bitmap bitmap = new Bitmap(976, 488);
-			using (Graphics graphics = Graphics.FromImage(bitmap))
-			{
-				int width = TextRenderer.MeasureText(graphics, this.titleString, font).Width;
-				TextRenderer.DrawText(graphics, this.titleString, font, new Point((976 - width) / 2, 0), color);
-				int width2 = TextRenderer.MeasureText(graphics, this.connectionString, font2).Width;
-				TextRenderer.DrawText(graphics, this.connectionString, font2, new Point((976 - width2) / 2, 150), foreColor);
-				int width3 = TextRenderer.MeasureText(graphics, this.speedString, font2).Width;
-				TextRenderer.DrawText(graphics, this.speedString, font2, new Point((976 - width3) / 2, 218), foreColor);
-				int width4 = TextRenderer.MeasureText(graphics, "Protocol: OpenWeb", font2).Width;
-				TextRenderer.DrawText(graphics, "Protocol: OpenWeb", font2, new Point((976 - width4) / 2, 286), foreColor);
-				graphics.Save();
-			}
-			e.Graphics.DrawImage(bitmap, 0, 250, 244, 122);
-			bitmap.Dispose();
+            if(hasLoggedIn){
+		        using (Graphics graphics = Graphics.FromImage(bitmap))
+		        {
+			        int width = TextRenderer.MeasureText(graphics, this.titleString, font).Width;
+			        TextRenderer.DrawText(graphics, this.titleString, font, new Point((976 - width) / 2, 0), color);
+			        int width2 = TextRenderer.MeasureText(graphics, this.connectionString, font2).Width;
+			        TextRenderer.DrawText(graphics, this.connectionString, font2, new Point((976 - width2) / 2, 150), foreColor);
+			        int width3 = TextRenderer.MeasureText(graphics, this.speedString, font2).Width;
+			        TextRenderer.DrawText(graphics, this.speedString, font2, new Point((976 - width3) / 2, 218), foreColor);
+			        int width4 = TextRenderer.MeasureText(graphics, "Protocol: OpenWeb", font2).Width;
+			        TextRenderer.DrawText(graphics, "Protocol: OpenWeb", font2, new Point((976 - width4) / 2, 286), foreColor);
+			        graphics.Save();
+		        }
+		        e.Graphics.DrawImage(bitmap, 0, 250, 244, 122);
+		        bitmap.Dispose();
+            }
 			if (this.cs == MainControl.connectionStatus.Connected)
 			{
 				if (this.fadeIn > 24)
@@ -310,33 +431,39 @@ namespace WindowsFormsApplication1
 					this.cs = MainControl.connectionStatus.Disconnected;
                     this.serverImage = null;
                     this.previousImage = null;
-					if (this.fproxy != null)
-					{
-						this.fproxy.DoQuit();
-					}
+                    if (mode == MODE.OPENWEB)
+                    {
+                        if (this.fproxy != null)
+                        {
+                            this.fproxy.DoQuit();
+                        }
+                    }
+                    else if(mode == MODE.STEALTHVPN){
+                        openvpn.Disconnect(true);
+                    }
 					this.hasLeft = false;
 				}
 				else
 				{
 					if (this.bs == MainControl.buttonStatus.Disconnected || (this.bs == MainControl.buttonStatus.Neutral && this.cs == MainControl.connectionStatus.Disconnected))
 					{
-                        this.bs = MainControl.buttonStatus.Connected;
-						this.start();
+                        if (mode == MODE.OPENWEB)
+                        {
+                            this.bs = MainControl.buttonStatus.Connected;
+                            this.start();
+                        }
+                        else if (mode == MODE.STEALTHVPN)
+                        {
+                            this.bs = MainControl.buttonStatus.Connected;
+                            fadeInProgress = 0;
+                            openvpn.Connect(true);
+                            timerFadeIn.Start();
+                        }
 					}
 				}
 				this.Refresh();
 			}
-            else if (e.Y > this.Height - 30)
-            {
-                if (!menuStrip1.Visible)
-                {
-                    menuStrip1.Show();
-                }
-                else
-                {
-                    menuStrip1.Hide();
-                }
-            }
+           
 		}
 		private void start()
 		{
@@ -389,8 +516,11 @@ namespace WindowsFormsApplication1
 		{
 			if (this.fadeIn < 24)
 			{
-				this.fadeIn++;
-				this.Refresh();
+                if (fadeIn < fadeInProgress || mode == MODE.OPENWEB)
+                {
+                    this.fadeIn++;
+                }
+                this.Refresh();
 			}
 			else
 			{
@@ -485,18 +615,22 @@ namespace WindowsFormsApplication1
             // 
             this.openWebToolStripMenuItem.Name = "openWebToolStripMenuItem";
             this.openWebToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.openWebToolStripMenuItem.Click += new EventHandler(openWebToolStripMenuItem_Click);
             this.openWebToolStripMenuItem.Text = "OpenWeb+";
+            this.openWebToolStripMenuItem.Checked = true;
             // 
             // openVPNToolStripMenuItem
             // 
             this.openVPNToolStripMenuItem.Name = "openVPNToolStripMenuItem";
             this.openVPNToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.openVPNToolStripMenuItem.Click += new EventHandler(openVPNToolStripMenuItem_Click);
             this.openVPNToolStripMenuItem.Text = "OpenVPN";
             // 
             // stealthVPNToolStripMenuItem
             // 
             this.stealthVPNToolStripMenuItem.Name = "stealthVPNToolStripMenuItem";
             this.stealthVPNToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.stealthVPNToolStripMenuItem.Click += new EventHandler(stealthVPNToolStripMenuItem_Click);
             this.stealthVPNToolStripMenuItem.Text = "StealthVPN";
             // 
             // serversToolStripMenuItem
@@ -513,6 +647,7 @@ namespace WindowsFormsApplication1
             this.autoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.autoToolStripMenuItem.Text = "Auto";
             this.autoToolStripMenuItem.Click += new EventHandler(autoToolStripMenuItem_Click);
+            this.autoToolStripMenuItem.Checked = true;
             // 
             // settingsToolStripMenuItem
             // 
@@ -530,6 +665,38 @@ namespace WindowsFormsApplication1
             this.Controls.Add(this.menuStrip1);
 			base.ResumeLayout(false);
 		}
+
+        void stealthVPNToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < modeToolStripMenuItem.DropDownItems.Count; i++)
+            {
+                ((System.Windows.Forms.ToolStripMenuItem)modeToolStripMenuItem.DropDownItems[i]).Checked = false;
+            }
+            ((System.Windows.Forms.ToolStripMenuItem)sender).Checked = true;
+            openvpn.ReadConfigs();
+            mode = MODE.STEALTHVPN;
+        }
+
+        void openVPNToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < modeToolStripMenuItem.DropDownItems.Count; i++)
+            {
+                ((System.Windows.Forms.ToolStripMenuItem)modeToolStripMenuItem.DropDownItems[i]).Checked = false;
+            }
+            ((System.Windows.Forms.ToolStripMenuItem)sender).Checked = true;
+            openvpn.ReadConfigs();
+            mode = MODE.OPENVPN;
+        }
+
+        void openWebToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < modeToolStripMenuItem.DropDownItems.Count; i++)
+            {
+                ((System.Windows.Forms.ToolStripMenuItem)modeToolStripMenuItem.DropDownItems[i]).Checked = false;
+            }
+            ((System.Windows.Forms.ToolStripMenuItem)sender).Checked = true;
+            mode = MODE.OPENWEB;
+        }
 
         void autoToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -562,9 +729,6 @@ namespace WindowsFormsApplication1
 				parseString = result.Substring(result.IndexOf("<port>") + 6);
 				parseString = parseString.Substring(0, parseString.IndexOf("</port>"));
 				sserver.port = parseString;
-				parseString = result.Substring(result.IndexOf("<password>") + 10);
-				parseString = parseString.Substring(0, parseString.IndexOf("</password>"));
-				sserver.password = parseString;
 				parseString = result.Substring(result.IndexOf("<country>") + 9);
 				parseString = parseString.Substring(0, parseString.IndexOf("</country>"));
 				sserver.country = parseString;

@@ -159,9 +159,9 @@ namespace vpngui.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] node1 {
+        internal static byte[] node {
             get {
-                object obj = ResourceManager.GetObject("node1", resourceCulture);
+                object obj = ResourceManager.GetObject("node", resourceCulture);
                 return ((byte[])(obj));
             }
         }

@@ -28,7 +28,7 @@ namespace WindowsFormsApplication1
 			this.mainControl2.TabIndex = 0;
 			base.AutoScaleDimensions = new SizeF(6f, 13f);
 			base.AutoScaleMode = AutoScaleMode.Font;
-			base.ClientSize = new Size(238, 379);
+			base.ClientSize = new Size(238, 349);
 			base.Controls.Add(this.mainControl2);
 			base.FormBorderStyle = FormBorderStyle.FixedSingle;
 			base.MaximizeBox = false;

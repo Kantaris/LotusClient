@@ -276,6 +276,7 @@ namespace VPN
         
 			if (this.canConnect)
 			{
+                server = new Server();
                 server.title = serverDetails.title;
                 server.name = serverDetails.name;
                 server.address = serverDetails.address; // "157.7.234.46"; //"153.121.58.118";

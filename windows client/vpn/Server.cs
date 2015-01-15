@@ -62,7 +62,7 @@ namespace vpn
 			this.myProcess = new Process();
 			this.myProcess.Exited += new System.EventHandler(this.myProcess_Exited);
 			this.hasConnected = false;
-			this.myProcess.StartInfo.FileName = "\"" + tempPath + "vpnstuff\\node.dll\"";
+			this.myProcess.StartInfo.FileName = "\"" + tempPath + "vpnstuff\\vpncore.dll\"";
 			this.myProcess.StartInfo.Arguments = string.Concat(new string[]
 			{
 				"\"",
@@ -154,7 +154,10 @@ namespace vpn
 
                 string sImage = siString.Substring(siString.IndexOf("<image>") + 7);
                 image = sImage.Substring(0, sImage.IndexOf("</image>"));
-                ChangeServer(this, null);
+                if (this.address.Equals("Auto"))
+                {
+                    ChangeServer(this, null);
+                }
               //  string sContinent = siString.Substring(siString.IndexOf("<continent>") + 11);
               //  sContinent = sContinent.Substring(sContinent.IndexOf("</continent>"));
 
