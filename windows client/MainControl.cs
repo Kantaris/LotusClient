@@ -86,6 +86,8 @@ namespace WindowsFormsApplication1
         };
         MODE mode = MODE.OPENWEB;
         private List<ServerDetails> serverList = new List<ServerDetails>();
+        string username = "";
+        string hash = "";
       //  StatsForm sf;
 		public MainControl()
 		{
@@ -216,11 +218,7 @@ namespace WindowsFormsApplication1
 			this.fproxy.ServerChangeEvent += new System.EventHandler(this.fproxy_ServerChangeEvent);
           
 			string tempPath = System.IO.Path.GetTempPath();
-			System.IO.Directory.CreateDirectory(tempPath + "vpnstuff\\");
-			if (!System.IO.File.Exists(tempPath + "vpnstuff\\vpncore.dll"))
-			{
-				System.IO.File.WriteAllBytes(tempPath + "vpnstuff\\vpncore.dll", Resources.node);
-			}
+
 			
 			if (System.IO.File.Exists(Application.StartupPath + "\\font\\CaviarDreams.ttf"))
 			{
@@ -467,7 +465,7 @@ namespace WindowsFormsApplication1
 		}
 		private void start()
 		{
-			this.fproxy.connect();
+			this.fproxy.connect(username, hash);
 			this.hasLeft = false;
 		}
 		private void MainControl_MouseMove(object sender, MouseEventArgs e)
@@ -710,11 +708,15 @@ namespace WindowsFormsApplication1
             {
                 this.fproxy.DoQuit();
             }
-            fproxy.connect();
+            fproxy.connect(username, hash);
         }
 
-        internal void setServerXml(string result)
+        internal void setServerXml(string username, string result)
         {
+            this.username = username;
+            string xhash = result.Substring(result.IndexOf("<hash>") + 6);
+            xhash = xhash.Substring(0, xhash.IndexOf("</hash>"));
+            hash = xhash;
             while(result.IndexOf("<server>") > -1){
 				var sserver = new ServerDetails();
 				var parseString = result.Substring(result.IndexOf("<title>") + 7);
@@ -770,7 +772,7 @@ namespace WindowsFormsApplication1
                      {
                          this.fproxy.DoQuit();
                      }
-                     fproxy.connectServer(serverList[i]);
+                     fproxy.connectServer(username, hash, serverList[i]);
                      updateServer();
                      break;
                 }

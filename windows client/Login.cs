@@ -10,6 +10,7 @@ using System.Net;
 using System.Collections.Specialized;
 using WindowsFormsApplication1;
 using System.Xml;
+using System.Reflection;
 
 namespace vpngui
 {
@@ -81,21 +82,27 @@ namespace vpngui
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            string url = "http://157.7.234.46/servers.xml"; // api/User/Login";
+            string url = "https://157.7.234.46/api/User/Login";
             using (var wb = new WebClient())
             {
                 wb.Proxy = null;
                 var data = new NameValueCollection();
-                data["username"] = "aaa"; // textBox1.Text;
+                int major = Assembly.GetExecutingAssembly().GetName().Version.Major;
+                int minor = Assembly.GetExecutingAssembly().GetName().Version.Minor;
+                data["username"] = textBox1.Text;
                 if (!textBox2.Text.Equals("XXXXXXXX"))
                 {
-                    data["password"] = "aaa"; // textBox2.Text;
+                    data["password"] =  textBox2.Text;
                 }
                 else
                 {
-                    data["password"] = "aaa"; // +Properties.Settings.Default.hash;
+                    data["password"] = Properties.Settings.Default.hash;
                 }
+                data["major"] = major.ToString();
+                data["minor"] = minor.ToString();
+                data["os"] = "Windows";
                 var response = wb.UploadValues(url, "POST", data);
+               
                 e.Result = response;
             }
         }
@@ -103,17 +110,49 @@ namespace vpngui
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             string ss = System.Text.Encoding.Default.GetString((byte[])e.Result);
-            if (!ss.Contains("<error>") )
+            if (ss.Contains("<software>"))
+            {
+                
+                    string udata = ss.Substring(ss.IndexOf("<software>"));
+                    udata = udata.Substring(0, udata.IndexOf("</software>"));
+                    string smajor = udata.Substring(udata.IndexOf("<vmajor>") + 8);
+                    smajor = smajor.Substring(0, smajor.IndexOf("</vmajor>"));
+                    string sminor = udata.Substring(udata.IndexOf("<vminor>") + 8);
+                    sminor = sminor.Substring(0, sminor.IndexOf("</vminor>"));
+                    int imajor = int.Parse(smajor);
+                    int iminor = int.Parse(sminor);
+                    int major = Assembly.GetExecutingAssembly().GetName().Version.Major;
+                    int minor = Assembly.GetExecutingAssembly().GetName().Version.Minor;
+                    bool needUpdate = false;
+                    if (major < imajor)
+                    {
+                        needUpdate = true;
+                    }
+                    else if (major == imajor && minor < iminor)
+                    {
+                        needUpdate = true;
+                    }
+                    if (needUpdate)
+                    {
+                        Update up = new Update();
+                        up.showInfo(udata);
+                        up.Show();
+                        this.Hide();
+                    }
+                
+               
+            }
+            if (ss.Contains("<msg>Success</msg>"))
             {
                 if (checkBox1.Checked && textBox1.Text.Length > 0)
                 {
                     Properties.Settings.Default.username = textBox1.Text;
-                    var parseString = ss.Substring(ss.IndexOf("<session_id>") + 6);
-                    parseString = parseString.Substring(0, parseString.IndexOf("</session_id>"));
+                    var parseString = ss.Substring(ss.IndexOf("<hash>") + 6);
+                    parseString = parseString.Substring(0, parseString.IndexOf("</hash>"));
                     Properties.Settings.Default.hash = parseString;
                     Properties.Settings.Default.Save();
                 }
-                Form1 main = new Form1(ss);
+                Form1 main = new Form1(textBox1.Text, ss);
                 main.Show();
                 main.FormClosed += new FormClosedEventHandler(main_FormClosed);
                // this.ShowInTaskbar = false;

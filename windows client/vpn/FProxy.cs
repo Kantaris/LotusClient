@@ -210,7 +210,7 @@ namespace VPN
 			return result;
 		}*/
 		
-		public void connect()
+		public void connect(string username, string hash)
 		{
 			if (this.canConnect)
 			{
@@ -218,7 +218,8 @@ namespace VPN
                 server.name = "Tokyo Server 2";
                 server.address = "Auto"; // "157.7.234.46"; //"153.121.58.118";
                 server.port = "1181";
-                server.password = "barfoo!";
+                server.username = username;
+                server.password = hash;
                 server.continent = "Asia";
                 server.ChangeServer += new Server.ChangeServerEventHandler(server_ChangeServer);
                server.Connect();
@@ -271,7 +272,7 @@ namespace VPN
 
 
 
-        internal void connectServer(vpngui.ServerDetails serverDetails)
+        internal void connectServer(string username, string hash, vpngui.ServerDetails serverDetails)
         {
         
 			if (this.canConnect)
@@ -281,7 +282,8 @@ namespace VPN
                 server.name = serverDetails.name;
                 server.address = serverDetails.address; // "157.7.234.46"; //"153.121.58.118";
                 server.port = "1180";
-                server.password = "barfoo!";
+                server.username = username;
+                server.password = hash;
                 server.image = serverDetails.image;
                 // server.continent = "Asia";
                 server.ChangeServer +=new Server.ChangeServerEventHandler(server_ChangeServer2);

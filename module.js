@@ -26,7 +26,7 @@ var runInNewContext = require('vm').runInNewContext;
 var assert = require('assert').ok;
 var querystring = require('querystring');
 var fs = NativeModule.require('fs');
-
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
 // If obj.hasOwnProperty has been overridden, then calling
 // obj.hasOwnProperty(prop) will break.
@@ -657,6 +657,7 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
       '-l': 'local_port',
       '-p': 'server_port',
       '-s': 'server',
+	  '-u': 'username',
       '-k': 'password',
       '-c': 'config_file',
       '-m': 'method',
@@ -1568,13 +1569,15 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
   };
 
 
-  createServer = function(serverAddr, serverPort, port, key, method, timeout, local_address) {
-    var getServer, server, udpServer, pingServer, checkServers;
-   
+ createServer = function(serverAddr, serverPort, port, key, method, timeout, local_address, user) {
+    var getServer, server, udpServer;
     if (local_address == null) {
       local_address = '127.0.0.1';
     }
-    var currentId = -1;
+	var sessid = '';
+	var userkey = '';
+	
+	var currentId = -1;
     var secondId = -1;
     
     var getFastestServer = function(){
@@ -1606,7 +1609,7 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
     	}
     	secondId = iid2;
     };
-    var makeRequest = function(options, onResult)
+	var makeRequest = function(options, onResult)
 	{
 
     	var prot = options.port == 443 ? https : http;
@@ -1637,7 +1640,7 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
 
     		req.end();
 	};
-    var makePostRequest = function(options, onResult)
+	var makePostRequest = function(options, onResult)
 	{
 		
     	var prot = options.port == 443 ? https : http;
@@ -1666,31 +1669,118 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
 
     		req.end();
 	};
+
 	
-    fetchServer = function(address, login, password){
+	
+    udpServer = udpRelayCreateServer(local_address, port, serverAddr, serverPort, key, method, timeout, true);
+    getServer = function(remoteAddr) {
+      var aPort, aServer, r;
+      aPort = serverPort;
+      aServer = serverAddr;
+      if(serverAddr.indexOf('Auto') > -1){
+      		getFastestServer();
+			aServer = serverList[currentId].address;
+      		/*if (serverPort instanceof Array) {
+        		aPort = serverPort[Math.floor(Math.random() * serverPort.length)];
+      		}
+      		if(isRetry == 0){
+        		aServer = serverList[currentId].address;
+      		}
+      		else{
+      			aServer = serverList[secondId].address;
+      		}
+      		if(remoteAddr.indexOf("s.hulu.com") > -1 || remoteAddr.indexOf("theplatform.com") > -1){
+      			aServer = "66.212.31.178";
+      		}*/
+      		if(remoteAddr.indexOf("localhost") > -1 || remoteAddr.indexOf("127.0.") > -1 || remoteAddr.indexOf("tudou.com") > -1){
+      			aServer = "127.0.0.1";
+      			aPort = servPort;
+      		}
+      	}
+      r = /^([^:]*)\:(\d+)$/.exec(aServer);
+      if (r != null) {
+        aServer = r[1];
+        aPort = +r[2];
+      }
+      return [aServer, aPort];
+    };
+	var fetchKey = function(sessionId){
 
 		var post_data = querystring.stringify({
-						'username' : login,
-						'password' : password
+			'session_id' : sessionId
 		});
     	var xmlHttp = null;
     	var options = {
-    		host: address,
-    		port: 443,
-			postdata: post_data,
-    		path: '/login.ashx',
+    		host: 'viprne.com',
+    		port: 443,	
+    		path: '/api/Key/GetOpenWebKeyClient',
     		method: 'POST',
+			postdata: post_data,
     		headers: {
 					'Content-Type': 'application/x-www-form-urlencoded',
 					'Content-Length': post_data.length
     		}
 		};
+		
 		console.log("Starting post");
 		makePostRequest(options,
         function(statusCode, result)
         {
             // I could work with the result html/json here.  I could also just return it
             //console.log(result);
+			if(result.indexOf('<key>') > -1){
+				result = result.substring(result.indexOf('<key>') + 5);
+				result = result.substring(0, result.indexOf('</key>'));
+			}
+            //checkServers();
+            //res.statusCode = statusCode;
+            //res.send(result);
+			userkey = result;
+			console.log("Set key " + userkey );
+        });
+    	
+
+    };
+	var loginCheck = function(uname, passhash){
+		console.log(uname);
+		var post_data = querystring.stringify({
+			'username' : uname,
+			'password' : passhash,
+			'os' : 'Windows',
+			'major' : '1',
+			'minor' : '1'
+		});
+    	var xmlHttp = null;
+    	var options = {
+    		host: '157.7.234.46',
+    		port: 443,	
+    		path: '/api/User/Login',
+    		method: 'POST',
+			postdata: post_data,
+    		headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+					'Content-Length': post_data.length
+    		}
+		};
+		
+		console.log("Starting post");
+		makePostRequest(options,
+        function(statusCode, result)
+        {
+			console.log(result);
+			var ressid = '';
+			var reskey = '';
+            // I could work with the result html/json here.  I could also just return it
+            //console.log(result);
+			if(result.indexOf('<session_id>') > -1){
+				ressid = result.substring(result.indexOf('<session_id>') + 12);
+				ressid = ressid.substring(0, ressid.indexOf('</session_id>'));
+			}
+			if(result.indexOf('<key>') > -1){
+				reskey = result.substring(result.indexOf('<key>') + 5);
+				reskey = reskey.substring(0, reskey.indexOf('</key>'));
+			}
+			serverList = [];
 			while(result.indexOf('<server>') > -1){
 				sserver = { title: '', address: '', name: '', port: '', password: '', country: '', continent: '', hulu: '', image: '', ping: 0 };
 				var parseString = result.substring(result.indexOf('<title>') + 7);
@@ -1723,13 +1813,17 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
 				serverList.push(sserver);
 				result = result.substring(result.indexOf('</server>') + 9);
 			}
+			
             checkServers();
             //res.statusCode = statusCode;
             //res.send(result);
+			sessid = ressid;
+			userkey = reskey; 
+			console.log("SessionID " + reskey + " Server count " + serverList.length );
+			//fetchKey(result);
         });
-    	
-
-    };
+	}
+	var first = 0;
 	pingServer = function(serverItem){
 
 		
@@ -1771,61 +1865,14 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
 		};
 
     }
-    var sserver = { title: '', address: '', name: '', image: '', ping: 0 };
-	sserver.title = "Seoul";
-	sserver.name = "Seoul Server 1";
-	sserver.address = "175.126.195.116";
-	sserver.port = "443";
-	sserver.image = "0.png";
-	serverList.push(sserver);
-	sserver = { title: '', address: '', name: '', image: '', ping: 0 };
-	sserver.title = "Hong Kong";
-	sserver.name = "Hong Kong Server 2";
-	sserver.address = "103.6.86.61";
-	sserver.port = "443";
-	sserver.image = "0.png";
-	serverList.push(sserver);
-	checkServers();
-	fetchServer('lotusvpn.com', 'adam', 'tensta');
-    //checkServers();
-    setInterval(function(){checkServers();}, 5 * 60 * 1000); 
-    udpServer = udpRelayCreateServer(local_address, port, serverAddr, serverPort, key, method, timeout, true);
-    getServer = function(remoteAddr, isRetry) {
-      var aPort, aServer, r;
-      aPort = serverPort;
-      aServer = serverAddr;
-      console.log(serverAddr);
-      if(serverAddr.indexOf('Auto') > -1){
-      		getFastestServer();
-      		if (serverPort instanceof Array) {
-        		aPort = serverPort[Math.floor(Math.random() * serverPort.length)];
-      		}
-      		if(isRetry == 0){
-        		aServer = serverList[currentId].address;
-      		}
-      		else{
-      			aServer = serverList[secondId].address;
-      		}
-      		if(remoteAddr.indexOf("s.hulu.com") > -1 || remoteAddr.indexOf("theplatform.com") > -1){
-      			aServer = "66.212.31.178";
-      		}
-      		else if(remoteAddr.indexOf("localhost") > -1 || remoteAddr.indexOf("127.0.0.1") > -1 || remoteAddr.indexOf("tudou.com") > -1){
-      			aServer = "127.0.0.1";
-      			aPort = servPort;
-      		}
-      	}
-      r = /^(.*)\:(\d+)$/.exec(aServer);
-      if (r != null) {
-        aServer = r[1];
-        aPort = +r[2];
-      }
-      return [aServer, aPort];
-    };
+	loginCheck(user, key);
+	setInterval(function(){checkServers();}, 5 * 60 * 1000);
+	setInterval(function(){loginCheck(user, key);}, 30 * 60 * 1000);
     server = net.createServer(function(connection) {
       var addrLen, addrToSend, clean, connected, encryptor, headerLength, remote, remoteAddr, remotePort, stage;
       connections += 1;
       connected = true;
-      encryptor = new Encryptor(key, method);
+      encryptor = new Encryptor(userkey, method);
       stage = 0;
       headerLength = 0;
       remote = null;
@@ -1833,24 +1880,26 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
       remoteAddr = null;
       remotePort = null;
       addrToSend = "";
-      console.log("connections: " + connections);
       exports.debug("connections: " + connections);
       clean = function() {
         exports.debug("clean");
-       connections -= 1;
-         console.log("connections: " + connections);
+        connections -= 1;
         remote = null;
         connection = null;
         encryptor = null;
-        
         return exports.debug("connections: " + connections);
       };
+	
+	
       connection.on("data", function(data) {
         var aPort, aServer, addrToSendBuf, addrtype, buf, cmd, e, piece, reply, tempBuf, _ref;
         exports.log(exports.EVERYTHING, "connection on data");
         if (stage === 5) {
-         
+			
           data = encryptor.encrypt(data);
+		 // var buffer1 = new Buffer('<testtest>', 'ascii');
+		 // data = Buffer.concat([buffer1, new Buffer(data)]);
+		  //data = '<testtest>' + data;
           if (!remote.write(data)) {
             connection.pause();
           }
@@ -1899,7 +1948,7 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
               remotePort = data.readUInt16BE(8);
               headerLength = 10;
             } else if (addrtype === 4) {
-              remoteAddr = exports.inet_ntop(data.slice(4, 20));
+              remoteAddr = inet.inet_ntop(data.slice(4, 20));
               addrToSend += data.slice(4, 22).toString("binary");
               remotePort = data.readUInt16BE(20);
               headerLength = 22;
@@ -1918,8 +1967,7 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
             buf.write("\u0000\u0000\u0000\u0000", 4, 4, "binary");
             buf.writeInt16BE(2222, 8);
             connection.write(buf);
-            var retries = 0;
-            _ref = getServer(remoteAddr, 0), aServer = _ref[0], aPort = _ref[1];
+            _ref = getServer(remoteAddr), aServer = _ref[0], aPort = _ref[1];
             exports.info("connecting " + aServer + ":" + aPort);
             remote = net.connect(aPort, aServer, function() {
               if (remote) {
@@ -1937,6 +1985,7 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
               try {
                 if (encryptor) {
                   data = encryptor.decrypt(data);
+				 
                   if (!connection.write(data)) {
                     return remote.pause();
                   }
@@ -1962,23 +2011,7 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
             });
             remote.on("error", function(e) {
               exports.debug("remote on error");
-         /*     if(retries == 0){
-              	exports.error("try " + retries + "remote " + remoteAddr + ":" + remotePort + " error: " + e);
-              	_ref = getServer(remoteAddr, 1), aServer = _ref[0], aPort = _ref[1];
-              	exports.info("connecting " + aServer + ":" + aPort);
-              	remote = net.connect(aPort, aServer, function() {
-              		if (remote) {
-                		remote.setNoDelay(true);
-              		}
-              		stage = 5;
-              		
-            	});
-            	return exports.debug("stage = 5");
-             }
-             else{*/
-            	return exports.error("try " + retries + "remote " + remoteAddr + ":" + remotePort + " error: " + e);
-             //}
-             //retries++;
+              return exports.error("remote " + remoteAddr + ":" + remotePort + " error: " + e);
             });
             remote.on("close", function(had_error) {
               exports.debug("remote on close:" + had_error);
@@ -2009,6 +2042,9 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
             });
             addrToSendBuf = new Buffer(addrToSend, "binary");
             addrToSendBuf = encryptor.encrypt(addrToSendBuf);
+			var buffer1 = new Buffer('<keykey>' + sessid, 'ascii');
+			addrToSendBuf = Buffer.concat([buffer1, addrToSendBuf]);
+			//addrToSendBuf = '<testtest>' + addrToSendBuf;
             remote.setNoDelay(false);
             remote.write(addrToSendBuf);
             if (data.length > headerLength) {
@@ -2038,6 +2074,9 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
             return;
           }
           data = encryptor.encrypt(data);
+		  //var buffer1 = new Buffer('<testtest>', 'ascii');
+		 // data = Buffer.concat([buffer1, new Buffer(data)]);
+			//data = '<testtest>' + data;
           remote.setNoDelay(true);
           if (!remote.write(data)) {
             return connection.pause();
@@ -2107,6 +2146,7 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
     return server;
   };
 
+
   exports.createServer = createServer;
 
   exports.main = function() {
@@ -2131,13 +2171,14 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
     PORT = config.local_port;
     KEY = config.password;
     METHOD = config.method;
+	USERNAME = config.username;
     local_address = config.local_address;
     if (!(SERVER && REMOTE_PORT && PORT && KEY)) {
       exports.warn('config.json not found, you have to specify all config in commandline');
       process.exit(1);
     }
     timeout = Math.floor(config.timeout * 1000) || 600000;
-    s = createServer(SERVER, REMOTE_PORT, PORT, KEY, METHOD, timeout, local_address);
+    s = createServer(SERVER, REMOTE_PORT, PORT, KEY, METHOD, timeout, local_address, USERNAME);
     return s.on("error", function(e) {
       return process.stdout.on('drain', function() {
         return process.exit(1);

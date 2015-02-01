@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Net;
 using vpngui.WindowsFormsApplication1;
+using System.Windows.Forms;
 namespace vpn
 {
 	internal class Server
@@ -19,6 +20,7 @@ namespace vpn
 		public string port;
 		public string continent;
 		public string country;
+        public string username;
 		public int ping = -1;
 		public bool isConnected = false;
 
@@ -62,15 +64,15 @@ namespace vpn
 			this.myProcess = new Process();
 			this.myProcess.Exited += new System.EventHandler(this.myProcess_Exited);
 			this.hasConnected = false;
-			this.myProcess.StartInfo.FileName = "\"" + tempPath + "vpnstuff\\vpncore.dll\"";
+			this.myProcess.StartInfo.FileName = Application.StartupPath + "\\core.dll";
 			this.myProcess.StartInfo.Arguments = string.Concat(new string[]
 			{
-				"\"",
-				tempPath,
-				"vpnstuff\\sslocacl\" -s ",
+				"alpha -s ",
 				this.address,
-				" -p 443 -l ",
+				" -p 21 -l ",
 				this.port,
+                " -u ",
+				this.username,
 				" -k ",
 				this.password,
 				" -m aes-256-cfb"
@@ -139,25 +141,27 @@ namespace vpn
 			Server.WriteErrorResponse(data);
 			if (data != null && data.Contains("<title>"))
 			{
-                string siString = data.Substring(data.IndexOf("<title>"));
-               // siString = siString.Substring(0, siString.IndexOf("</server>"));
-               // data = data.Substring(0, siString.IndexOf("</server>"));
+                string siString = data;
 
-                //string sId = siString.Substring(siString.IndexOf("<id>") + 4);
-                //sId = sId.Substring(sId.IndexOf("</id>"));
-
-                string sTitle = siString.Substring(siString.IndexOf("<title>") + 7);
-                title = sTitle.Substring(0, sTitle.IndexOf("</title>"));
-
-                string sName = siString.Substring(siString.IndexOf("<name>") + 6);
-                name = sName.Substring(0, sName.IndexOf("</name>"));
-
-                string sImage = siString.Substring(siString.IndexOf("<image>") + 7);
-                image = sImage.Substring(0, sImage.IndexOf("</image>"));
-                if (this.address.Equals("Auto"))
+                if (data.Contains("<title>"))
                 {
-                    ChangeServer(this, null);
+                    string sTitle = siString.Substring(siString.IndexOf("<title>") + 7);
+                    title = sTitle.Substring(0, sTitle.IndexOf("</title>"));
                 }
+                if(data.Contains("<name>")){
+                    string sName = siString.Substring(siString.IndexOf("<name>") + 6);
+                    name = sName.Substring(0, sName.IndexOf("</name>"));
+                }
+                if (data.Contains("<image>"))
+                {
+                    string sImage = siString.Substring(siString.IndexOf("<image>") + 7);
+                    image = sImage.Substring(0, sImage.IndexOf("</image>"));
+                    if (this.address.Equals("Auto"))
+                    {
+                        ChangeServer(this, null);
+                    }
+                }
+                
               //  string sContinent = siString.Substring(siString.IndexOf("<continent>") + 11);
               //  sContinent = sContinent.Substring(sContinent.IndexOf("</continent>"));
 

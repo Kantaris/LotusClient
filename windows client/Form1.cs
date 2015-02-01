@@ -40,12 +40,12 @@ namespace WindowsFormsApplication1
 			base.Load += new System.EventHandler(this.Form1_Load);
 			base.ResumeLayout(false);
 		}
-		public Form1(string xml)
+		public Form1(string username, string xml)
 		{
             
 			this.InitializeComponent();
             this.Text = "LotusVPN";
-            mainControl2.setServerXml(xml);
+            mainControl2.setServerXml(username, xml);
 		}
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
 		{
