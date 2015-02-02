@@ -1611,14 +1611,14 @@ var pack, printLocalHelp, printServerHelp, util, _logging_level;
     };
 	var makeRequest = function(options, onResult)
 	{
-
+		var start = new Date().getTime();
     	var prot = options.port == 443 ? https : http;
     		var req = prot.request(options, function(res)
     		{
     			var ret = {
     				server: options.server,
     			};
-    			var start = new Date().getTime();
+    			
         		var output = '';
         		res.setEncoding('utf8');
 
