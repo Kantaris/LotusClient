@@ -199,6 +199,7 @@ BOOL isConnected = NO;
 }
 - (void)windowWillClose:(NSNotification *)notification
 {
+    [self disconnectVPN];
     [self quitVPN];
 }
 
@@ -208,6 +209,7 @@ BOOL isConnected = NO;
     // The NSWindowCloseButton has been clicked.
     // Code to be run before the window closes.
     //
+    [self disconnectVPN];
      [self quitVPN];
      [self.window close];
 }
@@ -219,6 +221,10 @@ BOOL isConnected = NO;
     if (isSingleServer == NO) {
     if ((inData = [[notification userInfo] objectForKey:@"NSFileHandleNotificationDataItem"])) {
         NSString *str = [[NSString alloc] initWithData:inData encoding:NSUTF8StringEncoding];
+         NSLog(str);
+        if ([str rangeOfString:@"EADDRINUSE"].location != NSNotFound) {
+            [self connecting];
+        }
         if ([str rangeOfString:@"<title>"].location == NSNotFound) {
         } else {
             NSRange match;
@@ -258,6 +264,7 @@ BOOL isConnected = NO;
 
 -(void)applicationWillTerminate:(NSNotification *)notification
 {
+    //[self disconnectVPN];
     [self quitVPN];
 }
 
@@ -279,6 +286,73 @@ BOOL isConnected = NO;
     // Return nil to indicate not necessary to store a cached response for this connection
     return nil;
 }
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    
+    [self connectRetry];
+    
+}
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    NSString *xmlstr = [[NSString alloc] initWithData:_responseData encoding:NSUTF8StringEncoding];
+    if ([xmlstr rangeOfString:@"<msg>Success</msg>"].location != NSNotFound) {
+        // The request is complete and data has been received
+        // You can parse the stuff in your instance variable now
+        NSRange mz;
+        NSRange mz1;
+        mz = [xmlstr rangeOfString: @"<hash>"];
+        mz1 = [xmlstr rangeOfString: @"</hash>"];
+        hashString = [[NSString alloc] init];
+        hashString = [[xmlstr substringWithRange: NSMakeRange (mz.location+6, mz1.location - (mz.location+6))] retain];
+        NSString *ssu = usernameField.stringValue;
+        NSString *ssp = passwordField.stringValue;
+        userString = [usernameField.stringValue retain];
+        if ([rememberCheck state] == NSOnState) {
+            [[NSUserDefaults standardUserDefaults] setValue:ssu forKey:@"email"];
+            [[NSUserDefaults standardUserDefaults] setValue:ssp forKey:@"password"];
+        }
+        else{
+            [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:@"email"];
+            [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:@"password"];
+        }
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [win orderFront:0];
+        [loginWindow close];
+        NSMenu *mainMenu =
+        [[NSApplication sharedApplication] mainMenu];
+        NSMenu *appMenu = [[mainMenu itemAtIndex:2] submenu];
+        [appMenu removeItemAtIndex:0];
+        NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"Auto"
+                                                      action:@selector(testbutton:) keyEquivalent:@""];
+        
+        [item autorelease];
+        [item setTarget:self];
+        [appMenu addItem:item];
+        while ([xmlstr rangeOfString:@"<name>"].location != NSNotFound) {
+            
+            NSRange match;
+            NSRange match1;
+            match = [xmlstr rangeOfString: @"<name>"];
+            match1 = [xmlstr rangeOfString: @"</name>"];
+            NSString *tString = [xmlstr substringWithRange: NSMakeRange (match.location+6, match1.location - (match.location+6))];
+            xmlstr = [xmlstr substringWithRange: NSMakeRange (match1.location+6, xmlstr.length - (match1.location+6))];
+            
+            NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:tString
+                                                          action:@selector(testbutton:) keyEquivalent:@""];
+            
+            [item autorelease];
+            [item setTarget:self];
+            [appMenu addItem:item];
+        }
+    }
+    else{
+        [loginProgress stopAnimation:0];
+        [errorL setHidden:NO];
+        [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:@"email"];
+        [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:@"password"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    
+}
+
 - (IBAction)loginClicked:(id)sender {
     win = [self window];
     animState = ANIM_NONE;
@@ -309,13 +383,43 @@ BOOL isConnected = NO;
     [self.window setLevel:NSScreenSaverWindowLevel];
     NSString *ssu = usernameField.stringValue;
     NSString *ssp = passwordField.stringValue;
+    NSString *os =  @"Windows";
+    NSString *major =  @"1";
+    NSString *minor =  @"0";
     [errorL setHidden:YES];
     [loginProgress startAnimation:0];
-    NSString *post = [NSString stringWithFormat:@"Username=%@&Password=%@",ssu,ssp];
+    NSString *post = [NSString stringWithFormat:@"username=%@&password=%@&os=%@&major=%@&minor=%@",ssu,ssp,os,major,minor];
 	NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-    NSString *postLength = [NSString stringWithFormat:@"%d",[postData length]];
+    NSString *postLength = [NSString stringWithFormat:@"%lu",(unsigned long)[postData length]];
     NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] init] autorelease];
-    [request setURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://www.lotusvpn.com/login.ashx"]]];
+    [request setURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://157.7.234.46/api/User/Login"]]];
+    [request setHTTPMethod:@"POST"];
+    [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPBody:postData];
+    
+    NSURLConnection *conn = [[NSURLConnection alloc]initWithRequest:request delegate:self];
+    if(conn) {
+        NSLog(@"Connection Successful");
+    } else {
+        NSLog(@"Connection could not be made");
+    }
+}
+
+- (void) connectRetry{
+    
+    NSString *ssu = usernameField.stringValue;
+    NSString *ssp = passwordField.stringValue;
+    NSString *os =  @"Windows";
+    NSString *major =  @"1";
+    NSString *minor =  @"0";
+    [errorL setHidden:YES];
+    [loginProgress startAnimation:0];
+    NSString *post = [NSString stringWithFormat:@"username=%@&password=%@&os=%@&major=%@&minor=%@",ssu,ssp,os,major,minor];
+	NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    NSString *postLength = [NSString stringWithFormat:@"%lu",(unsigned long)[postData length]];
+    NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] init] autorelease];
+    [request setURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://157.7.194.214/api/User/Login"]]];
     [request setHTTPMethod:@"POST"];
     [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
@@ -330,69 +434,6 @@ BOOL isConnected = NO;
 }
 
 
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    NSString *xmlstr = [[NSString alloc] initWithData:_responseData encoding:NSUTF8StringEncoding];
-    if ([xmlstr rangeOfString:@"<error>"].location == NSNotFound) {
-        // The request is complete and data has been received
-        // You can parse the stuff in your instance variable now
-        NSRange mz;
-        NSRange mz1;
-        mz = [xmlstr rangeOfString: @"<hash>"];
-        mz1 = [xmlstr rangeOfString: @"</hash>"];
-        NSString *hashString = [xmlstr substringWithRange: NSMakeRange (mz.location+6, mz1.location - (mz.location+6))];
-        NSString *ssu = usernameField.stringValue;
-        NSString *ssp = passwordField.stringValue;
-        if ([rememberCheck state] == NSOnState) {
-            [[NSUserDefaults standardUserDefaults] setValue:ssu forKey:@"email"];
-            [[NSUserDefaults standardUserDefaults] setValue:hashString forKey:@"password"];
-        }
-        else{
-            [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:@"email"];
-            [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:@"password"];
-        }
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        [win orderFront:0];
-        [loginWindow close];
-        NSMenu *mainMenu = [[NSApplication sharedApplication] mainMenu];
-        NSMenu *appMenu = [[mainMenu itemAtIndex:2] submenu];
-        [appMenu removeItemAtIndex:0];
-        NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"Auto"
-                                                  action:@selector(testbutton:) keyEquivalent:@""];
-    
-        [item autorelease];
-        [item setTarget:self];
-        [appMenu addItem:item];
-        while ([xmlstr rangeOfString:@"<name>"].location != NSNotFound) {
-    
-            NSRange match;
-            NSRange match1;
-            match = [xmlstr rangeOfString: @"<name>"];
-            match1 = [xmlstr rangeOfString: @"</name>"];
-            NSString *tString = [xmlstr substringWithRange: NSMakeRange (match.location+6, match1.location - (match.location+6))];
-            xmlstr = [xmlstr substringWithRange: NSMakeRange (match1.location+6, xmlstr.length - (match1.location+6))];
-
-            NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:tString
-                                                  action:@selector(testbutton:) keyEquivalent:@""];
-        
-            [item autorelease];
-            [item setTarget:self];
-            [appMenu addItem:item];
-        }
-    }
-    else{
-        [loginProgress stopAnimation:0];
-        [errorL setHidden:NO];
-        [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:@"email"];
-        [[NSUserDefaults standardUserDefaults] setValue:@"" forKey:@"password"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    
-}
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    // The request has failed for some reason!
-    // Check the error var
-}
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
     [errorL setHidden:YES];
@@ -550,10 +591,23 @@ BOOL isConnected = NO;
 
 - (void)disconnecting
 {
-    if(runTask != nil && [runTask isRunning]){
-        [runTask terminate];
+    @try {
+        if(runTask != nil){
+            if([runTask isRunning]){
+                [runTask terminate];
+            }
+        }
+
     }
     
+    @catch ( NSException *e ) {
+        
+    }
+    
+    @finally {
+    }
+
+
     titleString = @"Disconnected";
     serverString = @"Not connected to any server";
     isConnected = NO;
@@ -634,23 +688,23 @@ BOOL isConnected = NO;
     [runTask setLaunchPath: exefile];
     
     NSString *exeDir = [[[NSBundle mainBundle] resourcePath]
-                        stringByAppendingPathComponent:@"local"];
+                        stringByAppendingPathComponent:@"alpha"];
     NSArray *pargs;
     int rand = 1000 + arc4random_uniform(1000);
     NSString *myT = [NSString stringWithFormat:@"%d", rand];
     if(isSingleServer == NO){
-        pargs = [NSArray arrayWithObjects: exeDir, @"-s", @"Auto" ,@"-p", @"443", @"-l", @"1179", @"-k", @"barfoo!", @"-m", @"aes-256-cfb", nil];
+        pargs = [NSArray arrayWithObjects: exeDir, @"-s", @"Auto" ,@"-p", @"443", @"-l", @"1179", @"-u", userString,@"-k", hashString, @"-m", @"aes-256-cfb", nil];
     }
     else{
-        pargs = [NSArray arrayWithObjects: exeDir, @"-s", osServer ,@"-p", osPort, @"-l", @"1179", @"-k", @"barfoo!", @"-m", @"aes-256-cfb", nil];
+        pargs = [NSArray arrayWithObjects: exeDir, @"-s", osServer ,@"-p", osPort, @"-l", @"1179", @"-u", userString,@"-k", hashString, @"-m", @"aes-256-cfb", nil];
     }
     [runTask setArguments: pargs];
     [runTask setStandardInput:pipe];
     [runTask setStandardOutput:outputPipe];
     [runTask setStandardError:outputPipe];
-    [runTask launch];
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center addObserver: self selector:@selector(stdoutDataAvailable:) name:NSFileHandleReadCompletionNotification object:reader];
+    [runTask launch];
     
     
     [self connectHelper];
@@ -865,6 +919,14 @@ u_int64_t getBytes(){
     [imageView2 setAlphaValue: 0];
 }
 
+- (BOOL)connection:(NSURLConnection *)connection canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace {
+    return [protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust];
+}
 
-
+- (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
+    if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust])
+            [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
+    
+    [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
+}
 @end

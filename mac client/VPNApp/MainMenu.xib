@@ -27,11 +27,11 @@
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
             <items>
-                <menuItem title="LotusALPHA" id="1Xt-HY-uBw">
+                <menuItem title="Client" id="1Xt-HY-uBw">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="LotusALPHA" systemMenu="apple" id="uQy-DD-JDr">
+                    <menu key="submenu" title="Client" systemMenu="apple" id="uQy-DD-JDr">
                         <items>
-                            <menuItem title="About LotusALPHA" id="5kV-Vb-QxS">
+                            <menuItem title="About Client" id="5kV-Vb-QxS">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="orderFrontStandardAboutPanel:" target="-1" id="Exp-CZ-Vem"/>
@@ -40,12 +40,12 @@
                             <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
                             <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW"/>
                             <menuItem isSeparatorItem="YES" id="4je-JR-u6R"/>
-                            <menuItem title="Hide LotusALPHA" keyEquivalent="h" id="Olw-nP-bQN">
+                            <menuItem title="Hide" keyEquivalent="h" id="Olw-nP-bQN">
                                 <connections>
                                     <action selector="hide:" target="-1" id="PnN-Uc-m68"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Quit LotusALPHA" keyEquivalent="q" id="4sb-4s-VLi">
+                            <menuItem title="Quit" keyEquivalent="q" id="4sb-4s-VLi">
                                 <connections>
                                     <action selector="terminate:" target="-1" id="Te7-pn-YzF"/>
                                 </connections>
@@ -62,15 +62,6 @@
                                 <connections>
                                     <action selector="newDocument:" target="-1" id="4Si-XN-c54"/>
                                 </connections>
-                            </menuItem>
-                            <menuItem title="OpenVPN" id="IAo-SY-fd9">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="openDocument:" target="-1" id="bVn-NM-KNZ"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="StealthVPN" id="tXI-mr-wws">
-                                <modifierMask key="keyEquivalentModifierMask"/>
                             </menuItem>
                         </items>
                     </menu>
@@ -102,7 +93,7 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Help" systemMenu="help" id="F2S-fz-NVQ">
                         <items>
-                            <menuItem title="LotusALPHA Help" keyEquivalent="?" id="FKE-Sm-Kum">
+                            <menuItem title="Client Help" keyEquivalent="?" id="FKE-Sm-Kum">
                                 <connections>
                                     <action selector="showHelp:" target="-1" id="y7X-2Q-9no"/>
                                 </connections>
@@ -113,7 +104,7 @@
             </items>
         </menu>
         <userDefaultsController representsSharedInstance="YES" id="nPh-L1-ykx"/>
-        <window identifier="mainWindow" title="LotusALPHA" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" visibleAtLaunch="NO" animationBehavior="default" id="QvC-M9-y7g">
+        <window identifier="mainWindow" title="Client" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" visibleAtLaunch="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <rect key="contentRect" x="844" y="121" width="240" height="360"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
@@ -122,7 +113,7 @@
                 <autoresizingMask key="autoresizingMask"/>
             </view>
         </window>
-        <window identifier="loginWindow" title="LotusALPHA" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" animationBehavior="default" id="Xf9-Vz-Gi0">
+        <window identifier="loginWindow" title="Client" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" animationBehavior="default" id="Xf9-Vz-Gi0">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <rect key="contentRect" x="196" y="240" width="262" height="174"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>

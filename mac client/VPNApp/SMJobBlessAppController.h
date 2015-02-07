@@ -92,6 +92,8 @@
     NSString *osPort;
     NSString *osName;
     NSString *osImage;
+    NSString *userString;
+    NSString *hashString;
     
     int animState;
     NSTask *runTask;
